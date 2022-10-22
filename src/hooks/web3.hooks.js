@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Web3UserContext } from "../context";
 import { TYPES } from "../context/reducer";
+import { presaleContract } from "../utils/contract.configs";
 
 export const useOnAppLoad = () => {
   const { initializePackages } = Web3UserContext();
@@ -9,6 +10,28 @@ export const useOnAppLoad = () => {
     initializePackages();
     // eslint-disable-next-line
   }, []);
+};
+
+export const useInitializeContracts = () => {
+  const {
+    dispatch,
+    contextState: { web3Instance, isCorrectChain },
+  } = Web3UserContext();
+
+  useEffect(() => {
+    const initContract = () => {
+      const presaleContractInstance = new web3Instance.eth.Contract(
+        presaleContract.abi,
+        presaleContract.address
+      );
+
+      dispatch({
+        type: TYPES.UPDATE_STATE,
+        payload: { presaleContractInstance, isContractInitialized: true },
+      });
+    };
+    web3Instance && isCorrectChain && initContract();
+  }, [web3Instance, isCorrectChain]);
 };
 
 /**

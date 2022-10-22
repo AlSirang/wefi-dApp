@@ -1,10 +1,9 @@
 import { loadWeb3Packages, switchNetwork } from "./utils";
 import { TYPES } from "./reducer";
 import { ACCEPTED_CHAIN_ID } from "../utils/constants";
-import { presaleContract } from "../utils/contract.configs";
 
 export default function actions(state, dispatch = () => {}) {
-  const { web3Instance, web3Modal, Web3, isWalletConnected } = state;
+  const { web3Modal, Web3, isWalletConnected } = state;
   // loads web packages
   const initializePackages = async () => {
     const { web3Modal, Web3 } = await loadWeb3Packages();
@@ -15,22 +14,6 @@ export default function actions(state, dispatch = () => {}) {
         Web3,
       },
     });
-  };
-
-  const initContract = (web3Instance) => {
-    if (!web3Instance) return;
-
-    const presaleContractInstance = new web3Instance.eth.Contract(
-      presaleContract.abi,
-      presaleContract.address
-    );
-
-    dispatch({
-      type: TYPES.UPDATE_STATE,
-      payload: { presaleContractInstance, isContractInitialized: true },
-    });
-
-    return presaleContractInstance;
   };
 
   const getNetworkInfo = async (provider, _web3Instance) => {
@@ -52,8 +35,6 @@ export default function actions(state, dispatch = () => {}) {
     });
 
     if (!isCorrectNetworkInfo) return await switchNetwork(provider);
-
-    initContract(_web3Instance);
   };
 
   /**
@@ -92,7 +73,6 @@ export default function actions(state, dispatch = () => {}) {
     initializePackages,
     walletConnect,
     getNetworkInfo,
-    initContract,
 
     // navtie state and dispatch
     contextState: state,

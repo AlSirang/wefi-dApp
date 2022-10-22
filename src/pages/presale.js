@@ -8,7 +8,6 @@ import { switchNetwork } from "../context/utils";
 
 const Presale = () => {
   const {
-    initContract,
     contextState: {
       account,
       isWalletConnected,
@@ -87,8 +86,6 @@ const Presale = () => {
     e.preventDefault();
 
     let contractInstance = presaleContractInstance;
-
-    if (!contractInstance) contractInstance = await initContract(web3Instance);
 
     const amountInWei = web3Instance.utils.toWei(bnbAmount.toString(), "ether");
 

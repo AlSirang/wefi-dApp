@@ -1,0 +1,258 @@
+:root {
+  --text-primary: #faf37b;
+  --text-secondary: #fff;
+  --bg-primary: #050709;
+  --bg-secondary: #54595f;
+  --background-color: #050709;
+  --secondary-text-color: #faf37b;
+  --background-secondary: #54595f;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Montserrat, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.theme-primary {
+  color: var(--text-primary);
+}
+
+div.logo {
+  color: var(--text-primary);
+  font-family: "Poppins", Sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.overlay-image {
+  background-image: url("../assets/img/background-image.png");
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 100%;
+}
+
+.overlay-color {
+  background-color: var(--bg-primary);
+  opacity: 0.9;
+  transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+
+.overlay-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+div.logo-padding-left {
+  padding-left: 20px;
+}
+
+.header-padding-right {
+  padding-right: 20px;
+}
+
+div.left-section {
+  background-color: #151920;
+}
+
+@media (max-width: 768px) {
+  .padding-around {
+    padding: 0 20px;
+  }
+
+  .overlay-container {
+    width: 100%;
+  }
+}
+
+.button-base {
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: "Montserrat", Sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.25em;
+  letter-spacing: 0px;
+
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.primary-button {
+  background-color: var(--secondary-text-color);
+  color: var(--background-color);
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: var(--secondary-text-color);
+  border: 1px solid var(--secondary-text-color);
+}
+
+.button-base:hover {
+  background-color: var(--background-secondary);
+  color: #fff;
+  border-color: var(--background-secondary);
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 5rem;
+}
+
+.buttons-container > button {
+  max-width: 80%;
+}
+
+.main-section {
+  margin-top: 5rem;
+  padding-bottom: 100px;
+}
+
+@media (max-width: 1020px) {
+  .buttons-container > button {
+    max-width: 100%;
+  }
+
+  div.np {
+    padding: 0;
+  }
+  .main-section {
+    margin-top: 5rem;
+  }
+}
+
+.presale-heading-title {
+  font-size: 38px;
+  line-height: 1.21em;
+}
+
+.presale-sub-heading-title {
+  font-size: 20px;
+}
+
+.presale-heading-title,
+.presale-sub-heading-title,
+.presale-sub-text {
+  font-family: "Montserrat", Sans-serif;
+  letter-spacing: 0px;
+  margin-bottom: 10px;
+}
+
+.presale-heading-title,
+.presale-sub-heading-title {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+.presale-sub-text {
+  text-align: left;
+  color: #dcdcdc;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.438em;
+}
+
+.presale-right-container {
+  display: flex;
+  justify-content: center;
+}
+
+.presale-coin-image {
+  vertical-align: middle;
+  display: inline-block;
+  max-width: 100%;
+  border: none;
+  max-height: 437px;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.right-box-left-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .right-main-section {
+    flex-direction: column-reverse;
+    gap: 20px;
+  }
+}
+
+.presale-heading-title-secondary {
+  color: var(--text-primary);
+}
+
+.icon-container {
+  position: relative;
+}
+
+.sort-icon {
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 35px;
+}
+
+.conversion-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input,
+.input::placeholder {
+  padding: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.input::placeholder {
+  padding-left: 0px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.input::-webkit-outer-spin-button,
+input.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"].input {
+  -moz-appearance: textfield;
+}
+
+label.input-label {
+  font-size: 1.2rem;
+}

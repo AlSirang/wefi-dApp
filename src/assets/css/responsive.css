@@ -1,0 +1,249 @@
+/* Normal desktop :1200px. */
+@media (min-width: 1500px) and (max-width: 1700px) {
+}
+
+/* Normal desktop :1200px. */
+@media (max-width: 1499px) {
+}
+
+/* Normal desktop :1200px. */
+@media (min-width: 1200px) and (max-width: 1499px) {
+}
+
+/* Normal desktop :1200px. */
+@media (max-width: 1399px) {
+}
+/* Normal desktop :1200px. */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .container {
+    max-width: 1120px;
+  }
+
+  .header-menu__nav ul li {
+    padding: 0px 12px;
+  }
+}
+
+/* Normal desktop :992px. */
+@media (max-width: 1199px) {
+}
+
+/* Tablet desktop :768px. */
+@media (max-width: 991px) {
+  .container {
+    max-width: 720px;
+  }
+  p {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .desc p br {
+    display: none;
+  }
+  .desc-share {
+    padding: 50px 50px 50px;
+    margin-bottom: 36px;
+    margin-top: 25px;
+  }
+  .desc-share__link-genaret form {
+    max-width: 480px;
+  }
+  .desc-joind {
+    padding: 40px 60px 46px 60px;
+    margin-bottom: 41px;
+  }
+  .footer-text {
+    margin-bottom: 40px;
+  }
+  .header-menu__lang .dropdown button {
+    padding-left: 0px;
+  }
+}
+
+/* small mobile :320px. */
+@media (max-width: 767px) {
+  .container {
+    max-width: 100%;
+  }
+
+  .header-padding {
+    padding: 15px 0px;
+  }
+  .header-logo a img {
+    max-width: 110px;
+  }
+  .desc h1 {
+    font-size: 32px;
+    line-height: 50px;
+  }
+  .desc h2 {
+    font-size: 32px;
+    line-height: 50px;
+  }
+  .desc h3 {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .desc p {
+    line-height: 1.8;
+    font-size: 14px;
+  }
+  .desc-img img {
+    max-width: 80%;
+  }
+  .desc-connect {
+    padding: 29px 0px;
+    margin-top: 28px;
+    margin-bottom: 20px;
+  }
+  .box::after {
+    border-radius: 8px;
+  }
+  .box {
+    border-radius: 8px;
+  }
+  .desc-connect img {
+    max-width: 180px;
+  }
+  .desc-connect img {
+    max-width: 180px;
+    margin-bottom: 20px;
+  }
+  .desc-connect__desc p {
+    margin-bottom: 24px;
+  }
+  .btn {
+    border-radius: 16px;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 16px 50px 17px;
+  }
+  .desc-share {
+    padding: 30px 20px 35px;
+  }
+  .desc-share__items a {
+    height: 40px;
+    width: 40px;
+  }
+
+  .desc-share__items a img {
+    max-width: 18px;
+  }
+  .desc-share__items {
+    margin-bottom: 20px;
+  }
+  .desc-share__link-genaret form input {
+    height: 54px;
+    border-radius: 6px;
+    padding: 0px 61px 0px 10px;
+    font-size: 14px;
+    line-height: 30px;
+  }
+  .desc-share__link-genaret form button {
+    height: 42px;
+    width: 42px;
+  }
+  .desc-share__link-genaret form button img {
+    max-width: 21px;
+    position: relative;
+    top: -1px;
+  }
+  .desc-share__link-genaret {
+    margin-bottom: 20px;
+  }
+  .desc-joind {
+    padding: 25px 15px 20px 15px;
+    margin-bottom: 32px;
+  }
+  .desc-joind h3 {
+    margin-bottom: 20px;
+  }
+  .desc-joind__item {
+    border-radius: 11px;
+    margin-bottom: 13px;
+    padding: 15px 18px;
+  }
+  .desc-joind__item-count {
+    flex: 0 0 auto;
+    width: 17%;
+  }
+  .desc-pagination ul li a {
+    height: 40px;
+    width: 40px;
+    font-size: 14px;
+    margin: 0px 4px;
+  }
+  .join-content h3 {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .join-content__social a {
+    height: 50px;
+    width: 50px;
+  }
+
+  .footer-top {
+    padding-top: 40px;
+    padding-bottom: 1px;
+  }
+
+  .footer-menu {
+    margin-bottom: 22px;
+  }
+  .footer-copy p {
+    font-size: 12px;
+  }
+  .footer-link a {
+    font-size: 14px;
+  }
+  .refer-padding {
+    padding-top: 48px;
+    padding-bottom: 50px;
+  }
+  .footer-text p {
+    font-size: 15px;
+    line-height: 26px;
+  }
+  .footer-text a {
+    margin-bottom: 17px;
+  }
+
+  .footer-text {
+    margin-bottom: 32px;
+  }
+  .join-padding {
+    padding-top: 50px;
+    padding-bottom: 45px;
+  }
+
+  .header-menu__lang .dropdown button {
+    padding-left: 0px;
+  }
+
+  .btn.btn-borderd::after {
+    font-size: 12px;
+  }
+  .btn.btn-borderd {
+    padding: 5.3px 15px 9px;
+  }
+
+  .header-right__btns a.btn {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+}
+
+/* Large Mobile :480px. */
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+  .container {
+    width: 450px;
+  }
+}
+/* Large Mobile :480px. */
+@media (max-width: 364px) {
+  .header-right__btns {
+    display: none;
+  }
+}

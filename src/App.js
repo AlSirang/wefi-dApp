@@ -1,12 +1,14 @@
 import { Web3ContextProvider } from "./context";
-import Presale from "./pages/presale";
+import RoutesProvider from "./routes";
 import "./styles/main.css";
 import Wrapper from "./Wrapper";
+
 function App() {
   return (
     <Web3ContextProvider>
       <Wrapper />
-      <Presale />
+
+      <RoutesProvider />
     </Web3ContextProvider>
   );
 }

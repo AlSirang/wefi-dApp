@@ -39,6 +39,7 @@ const Presale = () => {
     return () => {
       isComponentMounted.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isContractInitialized]);
 
   const [{ referralCode, bnbAmount, wefiAmount }, setInputs] = useState({

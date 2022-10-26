@@ -34,14 +34,9 @@ const Header = () => {
           <nav className="d-flex justify-content-end">
             <ul>
               <li>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-uppercase"
-                  href="https://www.wefitoken.com/dashboard"
-                >
+                <Link className="text-uppercase" to="/dashboard">
                   dashboard
-                </a>
+                </Link>
               </li>
               <li>
                 <a

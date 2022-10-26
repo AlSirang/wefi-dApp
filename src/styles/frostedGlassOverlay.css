@@ -1,0 +1,29 @@
+.overlay-effect-background,
+.overlay-effect-container {
+  position: absolute;
+}
+
+.overlay-effect-background {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.overlay-effect-container {
+  width: 70%;
+  min-height: 20rem;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(50px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+  .overlay-effect-container {
+    width: 100%;
+  }
+}

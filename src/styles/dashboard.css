@@ -1,0 +1,92 @@
+.dash-main {
+  margin-top: 1.5rem;
+  position: relative;
+}
+.referral-container {
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+.grid-gap > div {
+  padding: 10px;
+}
+
+.box-1-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+}
+.dash-text {
+  color: var(--text-primary);
+}
+.dash-heading {
+  font-size: 30px;
+}
+
+.dash-heading {
+  font-weight: 600;
+  line-height: 1.21em;
+  letter-spacing: 0px;
+}
+
+.inner-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.container-top,
+.inner-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.inner-container {
+  justify-content: space-between;
+  height: 100%;
+}
+.container-top {
+  gap: 10px;
+}
+button.dash-button {
+  max-width: 200px;
+}
+
+.container-bottom {
+  margin-top: 1.8rem;
+}
+
+@media (max-width: 768px) {
+  .dash-heading {
+    font-size: 20px;
+  }
+
+  .dash-sub-heading {
+    font-size: 18px;
+  }
+}
+
+.pointer-icon {
+  cursor: pointer;
+}
+
+.overlay-content {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  text-align: center;
+}
+
+.overlay-heading {
+  text-align: center;
+  font-weight: 600;
+  max-width: 500px;
+  padding-bottom: 20px;
+}

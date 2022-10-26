@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { Web3UserContext } from "../context";
 import { TYPES } from "../context/reducer";
-import { presaleContract } from "../utils/contract.configs";
+import {
+  presaleContract,
+  rWEFIContract,
+  vWEFIContract,
+  wefiTokenContract,
+} from "../utils/contract.configs";
 
 export const useOnAppLoad = () => {
   const { initializePackages } = Web3UserContext();
@@ -25,12 +30,32 @@ export const useInitializeContracts = () => {
         presaleContract.address
       );
 
+      const wefiContractInstance = new web3Instance.eth.Contract(
+        wefiTokenContract.abi,
+        wefiTokenContract.address
+      );
+
+      const vWefiContractInstance = new web3Instance.eth.Contract(
+        vWEFIContract.abi,
+        vWEFIContract.address
+      );
+      const rWefiContractInstance = new web3Instance.eth.Contract(
+        rWEFIContract.abi,
+        rWEFIContract.address
+      );
       dispatch({
         type: TYPES.UPDATE_STATE,
-        payload: { presaleContractInstance, isContractInitialized: true },
+        payload: {
+          presaleContractInstance,
+          wefiContractInstance,
+          vWefiContractInstance,
+          rWefiContractInstance,
+          isContractInitialized: true,
+        },
       });
     };
     web3Instance && isCorrectChain && initContract();
+    // eslint-disable-next-line
   }, [web3Instance, isCorrectChain]);
 };
 

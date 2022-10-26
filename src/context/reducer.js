@@ -18,6 +18,9 @@ export const initialState = {
   // contract instances
   isContractInitialized: false,
   presaleContractInstance: null,
+  wefiContractInstance: null,
+  vWefiContractInstance: null,
+  rWefiContractInstance: null,
 };
 
 export default function reducer(state, action) {

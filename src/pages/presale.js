@@ -1,10 +1,9 @@
-import Layout from "../components/layout";
-import coinImage from "../assets/img/coin.png";
-import sortImage from "../assets/img/sort.png";
 import { useEffect, useRef, useState } from "react";
-import { WalletConnect } from "../components/buttons";
+import Layout from "../components/layout";
 import { Web3UserContext } from "../context";
-import { switchNetwork } from "../context/utils";
+import Web3Buttons from "../components/Web3Buttons";
+import coinImage from "../assets/img/coin.png";
+// import sortImage from "../assets/img/sort.png";
 
 const Presale = () => {
   const {
@@ -15,14 +14,14 @@ const Presale = () => {
       isContractInitialized,
       presaleContractInstance,
       web3Instance,
-      provider,
     },
   } = Web3UserContext();
-  const [tokenPrice, setTokenPrice] = useState(0.000018);
+  const [tokenPrice, setTokenPrice] = useState(0);
 
   const isComponentMounted = useRef(true);
 
   useEffect(() => {
+    isComponentMounted.current = true;
     isContractInitialized &&
       (async () => {
         const tokenPriceInWei = await presaleContractInstance.methods
@@ -43,9 +42,9 @@ const Presale = () => {
   }, [isContractInitialized]);
 
   const [{ referralCode, bnbAmount, wefiAmount }, setInputs] = useState({
-    referralCode: null,
-    bnbAmount: null,
-    wefiAmount: null,
+    referralCode: "",
+    bnbAmount: "",
+    wefiAmount: "",
   });
 
   const onInputChange = (e) => {
@@ -110,122 +109,94 @@ const Presale = () => {
               </h2>
             </div>
 
-            <div className="buttons-container justify-content-center">
-              <WalletConnect
-                className="button-base primary-button connect-wallet"
-                style={{ maxWidth: 250 }}
-              />
-            </div>
+            <Web3Buttons walletConnectClasses="buttons-container" />
 
-            {isWalletConnected && (
-              <>
-                {!isCorrectChain && (
-                  <div className="mt-3">
-                    <p>Please switch network to correct chain.</p>
-                    <button
-                      onClick={switchNetwork.bind(this, provider)}
-                      className="button-base secondary-button"
-                      style={{ maxWidth: 200 }}
-                    >
-                      Switch Network
-                    </button>
-                  </div>
-                )}
-
-                {isCorrectChain && (
-                  <form id="checkout-form" onSubmit={onFormSubmit}>
-                    <div
-                      id="button-container"
-                      className="mt-5 justify-content-center"
-                    >
-                      <div className="form-group">
-                        <div className="icon-relative conversion-inputs">
-                          <span>
-                            <label className="input-label" htmlFor="bnbAmount ">
-                              BNB Amount
-                            </label>
-                            <input
-                              id="bnbAmount"
-                              type="number"
-                              name="bnbAmount"
-                              className="form-control input"
-                              aria-describedby="amountHelp"
-                              placeholder="0"
-                              required
-                              step="any"
-                              onChange={onInputChange}
-                              value={bnbAmount}
-                            />
-                          </span>
-
-                          <div className="icon-container ">
-                            <img
-                              className="sort-icon"
-                              src={sortImage}
-                              alt="sort icon"
-                            />
-                          </div>
-
-                          <span>
-                            <label
-                              className="input-label"
-                              htmlFor="wefiAmount "
-                            >
-                              WEFI Tokens Amount
-                            </label>
-
-                            <input
-                              id="wefiAmount"
-                              type="number"
-                              name="wefiAmount"
-                              className="form-control input"
-                              aria-describedby="WeFIamountHelp"
-                              placeholder="0"
-                              required
-                              step="any"
-                              onChange={onInputChange}
-                              value={wefiAmount}
-                            />
-                          </span>
-                        </div>
-                      </div>
-                      <hr style={{ marginBottom: 15 }} />
-
-                      <div className="form-group">
-                        <label className="input-label" htmlFor="referralCode ">
-                          Referral Code
+            {isWalletConnected && isCorrectChain && (
+              <form id="checkout-form" onSubmit={onFormSubmit}>
+                <div
+                  id="button-container"
+                  className="mt-5 justify-content-center"
+                >
+                  <div className="form-group">
+                    <div className="icon-relative conversion-inputs">
+                      <span>
+                        <label className="input-label" htmlFor="bnbAmount ">
+                          BNB Amount
                         </label>
                         <input
+                          id="bnbAmount"
                           type="number"
+                          name="bnbAmount"
                           className="form-control input"
-                          id="referralCode"
-                          name="referralCode"
-                          placeholder="Referral Code"
-                          aria-describedby="referraltHelp"
+                          aria-describedby="amountHelp"
+                          placeholder="0"
+                          required
+                          step="any"
                           onChange={onInputChange}
-                          value={referralCode}
+                          value={bnbAmount}
                         />
-                        <small
-                          id="referraltHelp"
-                          className="form-text text-muted"
-                        >
-                          Referral code (if any)
-                        </small>
-                      </div>
+                      </span>
 
-                      <div className="mt-5">
-                        <button
-                          className="button-base secondary-button"
-                          style={{ maxWidth: 200 }}
-                          type="submit"
-                        >
-                          Buy Now
-                        </button>
-                      </div>
+                      {/* <div className="icon-container">
+                        <img
+                          className="sort-icon"
+                          src={sortImage}
+                          alt="sort icon"
+                        />
+                      </div> */}
+
+                      <span>
+                        <label className="input-label" htmlFor="wefiAmount ">
+                          WEFI Tokens Amount
+                        </label>
+
+                        <input
+                          id="wefiAmount"
+                          type="number"
+                          name="wefiAmount"
+                          className="form-control input"
+                          aria-describedby="WeFIamountHelp"
+                          placeholder="0"
+                          required
+                          step="any"
+                          onChange={onInputChange}
+                          value={wefiAmount}
+                        />
+                      </span>
                     </div>
-                  </form>
-                )}
-              </>
+                  </div>
+                  <hr style={{ marginBottom: 15 }} />
+
+                  <div className="form-group">
+                    <label className="input-label" htmlFor="referralCode ">
+                      Referral Code
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control input"
+                      id="referralCode"
+                      name="referralCode"
+                      placeholder="Referral Code"
+                      aria-describedby="referraltHelp"
+                      onChange={onInputChange}
+                      value={referralCode}
+                    />
+                    <small id="referraltHelp" className="form-text text-muted">
+                      Referral code (if any)
+                    </small>
+                  </div>
+
+                  <div className="mt-5">
+                    <button
+                      className="button-base secondary-button"
+                      style={{ maxWidth: 200 }}
+                      type="submit"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+              </form>
             )}
           </div>
 

@@ -1,110 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import { Multicall } from "ethereum-multicall";
 import Layout from "../components/layout";
 import { DashboardBox } from "../components/dasnboard.units";
 import FrostedGlassOverlay from "../components/frostedGlassOverlay";
 import Web3Buttons from "../components/Web3Buttons";
 import { Web3UserContext } from "../context";
 import "../styles/dashboard.css";
-
-/**
-Information WRITEABLE for all smart contracts:
-
-TokenVestingWEFI:
-1) To claim the releaseable tokens from all the vesting schedules of the user. ( claimFromAllVestings( ) )
-
-TokenRewardsRegisterWEFI:
-2) To register(stake) WEFI tokens in the rewards register program. ( registerTokens( ) )
-
-3) To unregister(unstake) the registered tokens from the rewards register program. ( unregisterTokens( ) )
-
-4) To claim the reward tokens from the rewards register program. ( claimRewards( ) )
-
-NOTE: Check information READABLE points (16-20) if they needed to be included in dashboard.
- */
-
-/*****************************************/
-
-/**
- 
-    #2. This is updated readable information. It contains updated points in last 2 contracts.
-
-    Information readable for all 4 smart contracts:
-
-    TokenWEFI:
-    1) Total WEFI balance of the user after CONNECT WALLET. ( balanceOf( ) )
-    2) Total reflections distributed among the holders till the current time. ( totalReflectionsDistributed( ) )
-    3) Total tokens burnt till the current time. ( tokensBurnt( ) )
-
-    TokenVestingWEFI:
-    4) Total vWEFI balance of the user after CONNECT WALLET. ( balanceOf( ) )
-    5) Total releasable token amount for the beneficiary as per current time from all his vesting schedules. ( computeReleaseableAmount( ) )
-    6) Last vesting schedule of the beneficiary, if he has multiple vesting schedules then the last one will be shown. ( getLastVestingScheduleForBeneficiary( ) )
-    7) Number of tokens locked in vesting schedule. ( totalSupply( ) )
-
-    TokenPresaleWEFI:
-    8) Total amount of BNBs raised i.e. total BNB balance of the contract. ( getContractBnbBalance( ) )
-    9) Total amount of WEFI tokens left in the presale contract for sale. ( getContractTokenBalance( ) )
-    10) Vesting schedule for current presale round as per of which tokens will be locked if someone buys. ( getVestingSchedule( ) )
-    11) Token price in BNB for 1 token. ( tokenPriceInWei( ) )
-    12) To fetch/show the referral code of any account address. ( showReferralCode( ) )
-    13) There is an extra bonus percentage as an incentive which the buyer will get if he will use someone's referral code. ( referralCodeBonusPercentage( ) )
-    14) Referrer will get that amount of commission percentage if he refers some byer to presale. ( referralCommissionPercentage( ) )
-    15) Vesting schedule of Buyer and Referrer could also be accessed. ( getBuyerVestingSchedule( ), getReferrerVestingSchedule( ) )
-
-    TokenRewardsRegisterWEFI:
-    16) Total rWEFI balance of the user after CONNECT WALLET. ( balanceOf( ) )
-    17) Time duration for getting rewards after registration. ( registeringDurationForRewards( ) )
-    18) Total amount of tokens registered in the contract. ( totalRegisteredBalanceWEFI( ) )
-    19) Total amount of token rewards which are due for distribution in the contract. ( totalRewardsBalanceWEFI( ) )
-    20) Total amount of rewards that the user could claim and what is his release time. ( viewClaimableRewardsAndReleaseTime( ) )
- */
-
-/******************************************* */
-
-/**
-     
-TokenWEFI:
-============
-Amount of WEFI Token = Total WEFI balance of the user after CONNECT WALLET. ( balanceOf() )
-
-
-
-2)TokenVestingWEFI:
-===================
-Amount of vWEFI - Total vWEFI balance of the user after CONNECT WALLET. ( balanceOf() )
-
-Available vWEFI - Total releasable token amount for the beneficiary as per current time from all his vesting schedules. ( computeReleaseableAmount() )
-
-Locked For - Last vesting schedule of the beneficiary, if he has multiple vesting schedules then the last one will be shown. ( getLastVestingScheduleForBeneficiary() )
-
-vWEFI Locked - Number of tokens locked in vesting schedule. ( totalSupply() )
-
-
-4)TokenRewardsRegisterWEFI:
-===========================
-Reward Member For - Time duration for getting rewards after registration. ( registeringDurationForRewards() )
-
-Amount of rWEFI - Total rWEFI balance of the user after CONNECT WALLET. ( balanceOf() )
-     */
-
-/**
- * 
- * 
- * TokenWEFI:
-https://testnet.bscscan.com/address/0xfa5b406af41f2f2bbcd432db23c11d122701a1db#code
-
-TokenVestingWEFI:
-https://testnet.bscscan.com/address/0x281a8583378486112169bc9e9860252fa60dfcbe#code
-
-TokenPresaleWEFI:
-https://testnet.bscscan.com/address/0xd5b6adc7fca70f0330abb71454c2066d9e91ebf3#code
-
-TokenRewardsRegisterWEFI:
-https://testnet.bscscan.com/address/0x95507c95d51953420039051719c7ffab612f956c#code
-
- */
+import {
+  presaleContract,
+  rWEFIContract,
+  vWEFIContract,
+  wefiTokenContract,
+} from "../utils/contract.configs";
 
 let setTimeoutId = null;
+const SECONDS_IN_DAY = 60 * 60 * 24;
 
 const Dashboard = () => {
   const {
@@ -112,17 +22,18 @@ const Dashboard = () => {
       account,
       isCorrectChain,
       isWalletConnected,
-      wefiContractInstance,
       vWefiContractInstance,
-      presaleContractInstance,
       rWefiContractInstance,
-
       web3Instance,
       isContractInitialized,
     },
   } = Web3UserContext();
 
+  const toEther = (value) =>
+    Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(0);
+
   const copyIconRef = useRef();
+
   const onCopy = (paload) => {
     navigator.clipboard.writeText(paload).then(
       function () {
@@ -147,6 +58,9 @@ const Dashboard = () => {
       lockedTokens,
       releaseable_vWefiBalance,
       vWefiLockedDuration,
+      stakeRewardDuration,
+      rWeifTotal,
+      rWefiClaimable,
     },
     setState,
   ] = useState({
@@ -157,44 +71,143 @@ const Dashboard = () => {
     lockedTokens: 0,
     releaseable_vWefiBalance: 0,
     vWefiLockedDuration: 0,
+    rWeifTotal: 0,
+    rWefiClaimable: 0,
+    rWefiClaimDuration: 0,
   });
-
-  const toEther = (value) =>
-    Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(2);
 
   const loadData = async () => {
     try {
-      const _referralCode = presaleContractInstance.methods
-        .showReferralCode(account)
-        .call();
+      let multicall = new Multicall({
+        multicallCustomContractAddress:
+          "0x7D44ce82D27eA6D6F19805e152d92807e504367A",
+        web3Instance: web3Instance,
+        tryAggregate: true,
+      });
 
-      const _wefiBalance = wefiContractInstance.methods
-        .balanceOf(account)
-        .call();
+      const contractCallContext = [
+        {
+          reference: "presaleContract",
+          contractAddress: presaleContract.address,
+          abi: presaleContract.abi,
+          calls: [
+            {
+              reference: "presaleContract",
+              methodName: "showReferralCode",
+              methodParameters: [account],
+            },
+          ],
+        },
+        {
+          reference: "wefiTokenContract",
+          contractAddress: wefiTokenContract.address,
+          abi: wefiTokenContract.abi,
+          calls: [
+            {
+              reference: "wefiToken",
+              methodName: "balanceOf",
+              methodParameters: [account],
+            },
+          ],
+        },
 
-      const _rWefiBalance = rWefiContractInstance.methods
-        .balanceOf(account)
-        .call();
+        {
+          reference: "rWefiContract",
+          contractAddress: rWEFIContract.address,
+          abi: rWEFIContract.abi,
+          calls: [
+            {
+              reference: "rwefiContract",
+              methodName: "balanceOf",
+              methodParameters: [account],
+            },
+            {
+              reference: "rwefiContract",
+              methodName: "registerDurationForRewards",
+              methodParameters: [],
+            },
+            {
+              reference: "rwefiContract",
+              methodName: "totalSupply",
+              methodParameters: [],
+            },
+            {
+              reference: "rwefiContract",
+              methodName: "viewClaimableRewardsAndReleaseTime",
+              methodParameters: [account],
+            },
+          ],
+        },
 
-      const _vWefiBalance = vWefiContractInstance.methods
-        .balanceOf(account)
-        .call();
+        {
+          reference: "vwefiTokenContract",
+          contractAddress: vWEFIContract.address,
+          abi: vWEFIContract.abi,
+          calls: [
+            {
+              reference: "vWefiContract",
+              methodName: "balanceOf",
+              methodParameters: [account],
+            },
+            {
+              reference: "vWefiContract",
+              methodName: "totalSupply",
+              methodParameters: [],
+            },
+            {
+              reference: "vWefiContract",
+              methodName: "computeAllReleasableAmountForBeneficiary",
+              methodParameters: [account],
+            },
+            {
+              reference: "vWefiContract",
+              methodName: "getLastVestingScheduleForBeneficiary",
+              methodParameters: [account],
+            },
+          ],
+        },
+      ];
 
-      const _lockedTokens = vWefiContractInstance.methods.totalSupply().call();
+      const { results } = await multicall.call(contractCallContext);
 
-      const [
-        referralCode,
-        wefiBalance,
-        rWefiBalance,
-        vWefiBalance,
-        lockedTokens,
-      ] = await Promise.all([
-        _referralCode,
-        _wefiBalance,
-        _rWefiBalance,
-        _vWefiBalance,
-        _lockedTokens,
-      ]);
+      console.log({ results });
+      const wefiBalance = Number(
+        results.wefiTokenContract.callsReturnContext[0].returnValues[0].hex
+      );
+      const referralCode = Number(
+        results.presaleContract.callsReturnContext[0].returnValues[0].hex
+      );
+      const rWefiBalance = Number(
+        results.rWefiContract.callsReturnContext[0].returnValues[0].hex
+      );
+      const stakeRewardDuration = Number(
+        results.rWefiContract.callsReturnContext[1].returnValues[0].hex
+      );
+      const rWeifTotal = Number(
+        results.rWefiContract.callsReturnContext[2].returnValues[0].hex
+      );
+      const rWefiClaimable = Number(
+        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
+      );
+      const rWefiClaimDuration = Number(
+        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
+      );
+      const vWefiBalance = Number(
+        results.vwefiTokenContract.callsReturnContext[0].returnValues[0].hex
+      );
+      const lockedTokens = Number(
+        results.vwefiTokenContract.callsReturnContext[1].returnValues[0].hex
+      );
+
+      let releaseable_vWefiBalance =
+        results.vwefiTokenContract.callsReturnContext[2].returnValues[0]?.hex ||
+        0;
+      let vWefiLockedDuration =
+        results.vwefiTokenContract.callsReturnContext[3].returnValues[0]?.hex ||
+        0;
+
+      releaseable_vWefiBalance = Number(releaseable_vWefiBalance || 0);
+      vWefiLockedDuration = Number(vWefiLockedDuration || 0);
 
       setState((p) => ({
         ...p,
@@ -203,29 +216,14 @@ const Dashboard = () => {
         rWefiBalance: toEther(rWefiBalance),
         vWefiBalance: toEther(vWefiBalance),
         lockedTokens: toEther(lockedTokens),
+        rWeifTotal: toEther(rWeifTotal),
+        releaseable_vWefiBalance: toEther(releaseable_vWefiBalance),
+        vWefiLockedDuration: Math.ceil(vWefiLockedDuration / SECONDS_IN_DAY),
+        stakeRewardDuration: Math.ceil(stakeRewardDuration / SECONDS_IN_DAY),
+
+        rWefiClaimable: toEther(rWefiClaimable),
+        rWefiClaimDuration: rWefiClaimDuration / SECONDS_IN_DAY,
       }));
-
-      vWefiContractInstance.methods
-        .computeAllReleasableAmountForBeneficiary(account)
-        .call()
-        .then((res) => {
-          setState((p) => ({
-            ...p,
-            releaseable_vWefiBalance: toEther(res),
-          }));
-        })
-        .catch(console.log);
-
-      vWefiContractInstance.methods
-        .getLastVestingScheduleForBeneficiary(account)
-        .call()
-        .then((res) => {
-          setState((p) => ({
-            ...p,
-            vWefiLockedDuration: res,
-          }));
-        })
-        .catch(console.log);
     } catch (err) {
       console.log({ loadDataErr: err });
     }
@@ -239,6 +237,75 @@ const Dashboard = () => {
       loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, isContractInitialized, isCorrectChain, isWalletConnected]);
+
+  const claimFromAllVestings = () => {
+    vWefiContractInstance.methods
+      .claimFromAllVestings()
+      .send({ from: account })
+      .once("transactionHash", async function (txHash) {})
+      .once("receipt", async (receipt) => {
+        loadData();
+      })
+      .on("error", (err) => {});
+  };
+
+  const claimRWEFI = () => {
+    rWefiContractInstance.methods
+      .claimRewards()
+      .send({ from: account })
+      .once("transactionHash", async function (txHash) {})
+      .once("receipt", async (receipt) => {
+        loadData();
+      })
+      .on("error", (err) => {});
+  };
+
+  const [
+    {
+      toRegister,
+      //toUnregister
+    },
+    setInputs,
+  ] = useState({
+    toRegister: "",
+    // toUnregister: "",
+  });
+
+  const onInputChange = (e) => {
+    const { value } = e.target;
+    // if (name === "registerWEFI")
+    setInputs({
+      toRegister: value,
+      //toUnregister: ""
+    });
+    // return setInputs({ toRegister: "", toUnregister: value });
+  };
+  const registerTokens = (value) => {
+    rWefiContractInstance.methods
+      .registerTokens(value)
+      .send({ from: account })
+      .once("transactionHash", async function (txHash) {})
+      .once("receipt", async (receipt) => {
+        loadData();
+      })
+      .on("error", (err) => {});
+  };
+  const unregisterTokens = () => {
+    rWefiContractInstance.methods
+      .unregisterTokens()
+      .send({ from: account })
+      .once("transactionHash", async function (txHash) {})
+      .once("receipt", async (receipt) => {
+        loadData();
+      })
+      .on("error", (err) => {});
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    registerTokens(toRegister);
+    // if (toUnregister > 0) return unregisterTokens(toUnregister);
+  };
   return (
     <Layout>
       <div className="container dash-main">
@@ -297,13 +364,16 @@ const Dashboard = () => {
                   <div className="inner-row">
                     <h4 className="dash-sub-heading">vWEFI Locked </h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {wefiBalance}
+                      {lockedTokens}
                     </h4>
                   </div>
                 </div>
 
                 <div className="container-bottom">
-                  <button className="dash-button button-base primary-button ">
+                  <button
+                    onClick={claimFromAllVestings}
+                    className="dash-button button-base primary-button "
+                  >
                     Claim vWEFI
                   </button>
                 </div>
@@ -312,35 +382,70 @@ const Dashboard = () => {
           </div>
           <div className="col-lg-6 col-md-12">
             <DashboardBox>
-              <div className="inner-container">
-                <div className="container-top">
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Reward Member For </h4>
-                    <h4 className="dash-text dash-sub-heading">0 Days</h4>
-                  </div>
+              <form onSubmit={onSubmit}>
+                <div className="inner-container">
+                  <div className="container-top">
+                    <div className="inner-row">
+                      <h4 className="dash-sub-heading">Reward Member For </h4>
+                      <h4 className="dash-text dash-sub-heading">
+                        {stakeRewardDuration} Days
+                      </h4>
+                    </div>
 
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading"> Amount of rWEFI</h4>
+                    <div className="inner-row">
+                      <h4 className="dash-sub-heading"> Amount of rWEFI</h4>
+                      <h4 className="dash-text dash-sub-heading">
+                        {rWefiBalance}
+                      </h4>
+                    </div>
+
+                    <div className="inner-row">
+                      <h4 className="dash-sub-heading">Register </h4>
+                      <h4 className="dash-text dash-sub-heading">
+                        <input
+                          value={toRegister}
+                          onChange={onInputChange}
+                          name="registerWEFI"
+                          className="inline-input input"
+                          type="number"
+                          autoComplete="off"
+                          required
+                        />
+                        WEFI
+                      </h4>
+                    </div>
+                    <div className="inner-row">
+                      {/* <h4 className="dash-sub-heading">Unregister </h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {rWefiBalance}
-                    </h4>
+                      <input
+                        value={toUnregister}
+                        onChange={onInputChange}
+                        name="unregisterWEFI"
+                        className="inline-input input"
+                        type="number"
+                        autoComplete="off"
+                      />
+                      rWEFI
+                    </h4> */}
+                    </div>
                   </div>
-
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Register </h4>
-                    <h4 className="dash-text dash-sub-heading">___ WEFI</h4>
-                  </div>
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Unregister </h4>
-                    <h4 className="dash-text dash-sub-heading">___ rWEFI</h4>
+                  <div className="container-bottom buttons-grid">
+                    <button
+                      type="submit"
+                      className="dash-button button-base primary-button "
+                    >
+                      Register
+                    </button>
+                    <button
+                      type="button"
+                      onClick={unregisterTokens}
+                      className="dash-button button-base secondary-button "
+                    >
+                      Unregister
+                    </button>
                   </div>
                 </div>
-                <div className="container-bottom">
-                  <button className="dash-button button-base primary-button ">
-                    Submit Now
-                  </button>
-                </div>
-              </div>
+              </form>
             </DashboardBox>
           </div>
           <div className="col-lg-6 col-md-12">
@@ -349,16 +454,21 @@ const Dashboard = () => {
                 <div className="container-top">
                   <div className="inner-row">
                     <h4 className="dash-sub-heading">Eligible rWEFI </h4>
-                    <h4 className="dash-text dash-sub-heading">0</h4>
+                    <h4 className="dash-text dash-sub-heading">
+                      {rWefiClaimable}
+                    </h4>
                   </div>
                   <div className="inner-row">
                     <h4 className="dash-sub-heading">Total rWEFI</h4>
-                    <h4 className="dash-text dash-sub-heading">0</h4>
+                    <h4 className="dash-text dash-sub-heading">{rWeifTotal}</h4>
                   </div>
                 </div>
 
                 <div className="container-bottom">
-                  <button className="dash-button button-base primary-button ">
+                  <button
+                    onClick={claimRWEFI}
+                    className="dash-button button-base primary-button "
+                  >
                     Claim rWEFI
                   </button>
                 </div>

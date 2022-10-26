@@ -90,3 +90,28 @@ button.dash-button {
   max-width: 500px;
   padding-bottom: 20px;
 }
+
+input.inline-input {
+  position: relative;
+
+  top: -6px;
+  left: -5px;
+  display: inline-block;
+
+  background: transparent;
+
+  border: none;
+  max-width: 100px;
+  width: 100%;
+
+  border-bottom: 1px solid var(--text-primary);
+  padding: 0;
+  color: var(--text-primary);
+  font-weight: normal;
+}
+
+.buttons-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

@@ -90,10 +90,16 @@ const Presale = () => {
     const amountInWei = web3Instance.utils.toWei(bnbAmount.toString(), "ether");
 
     const _referralCode = referralCode || 0;
-    await contractInstance.methods.buyToken(_referralCode).send({
-      from: account,
-      value: amountInWei,
-    });
+    contractInstance.methods
+      .buyToken(_referralCode)
+      .send({
+        from: account,
+        value: amountInWei,
+      })
+
+      .once("transactionHash", async function (txHash) {})
+      .once("receipt", async (receipt) => {})
+      .on("error", (err) => {});
   };
 
   return (
@@ -129,6 +135,7 @@ const Presale = () => {
                           name="bnbAmount"
                           className="form-control input"
                           aria-describedby="amountHelp"
+                          autoComplete="off"
                           placeholder="0"
                           required
                           step="any"
@@ -155,6 +162,7 @@ const Presale = () => {
                           type="number"
                           name="wefiAmount"
                           className="form-control input"
+                          autoComplete="off"
                           aria-describedby="WeFIamountHelp"
                           placeholder="0"
                           required
@@ -176,6 +184,7 @@ const Presale = () => {
                       className="form-control input"
                       id="referralCode"
                       name="referralCode"
+                      autoComplete="off"
                       placeholder="Referral Code"
                       aria-describedby="referraltHelp"
                       onChange={onInputChange}

@@ -19,6 +19,12 @@ import TransactionModal, {
   onTxHash,
 } from "../components/transactionModal";
 
+// todo:
+
+// update the tx fee suggestions
+
+// use gaseEstimate function from web3.
+
 let setTimeoutId = null;
 const SECONDS_IN_DAY = 60 * 60 * 24;
 

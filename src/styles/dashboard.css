@@ -69,10 +69,6 @@ button.dash-button {
   }
 }
 
-.pointer-icon {
-  cursor: pointer;
-}
-
 .overlay-content {
   display: flex;
   justify-content: center;
@@ -93,17 +89,13 @@ button.dash-button {
 
 input.inline-input {
   position: relative;
-
   top: -6px;
   left: -5px;
   display: inline-block;
-
   background: transparent;
-
   border: none;
   max-width: 100px;
   width: 100%;
-
   border-bottom: 1px solid var(--text-primary);
   padding: 0;
   color: var(--text-primary);
@@ -114,4 +106,15 @@ input.inline-input {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* tx-modal */
+.tx-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  padding: 20px;
 }

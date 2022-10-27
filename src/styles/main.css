@@ -8,6 +8,7 @@
   --background-color: #050709;
   --secondary-text-color: #faf37b;
   --background-secondary: #54595f;
+  --primary: #faf37b;
 }
 
 * {
@@ -257,4 +258,18 @@ input[type="number"].input {
 
 label.input-label {
   font-size: 1.2rem;
+}
+
+.fa-icon {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.icon-img {
+  width: 50px;
+  height: 50px;
+}
+
+.pointer-icon {
+  cursor: pointer;
 }

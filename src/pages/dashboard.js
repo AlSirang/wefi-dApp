@@ -37,7 +37,7 @@ const Dashboard = () => {
   } = Web3UserContext();
 
   const toEther = (value) =>
-    Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(0);
+    Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(2);
 
   /***** Local States *****/
   const [modalText, setModalText] = useState(null);
@@ -232,10 +232,10 @@ const Dashboard = () => {
         ...p,
         referralCode,
         wefiBalance: toEther(wefiBalance),
-        rWefiBalance: rWefiBalance,
+        rWefiBalance: toEther(rWefiBalance),
         vWefiBalance: toEther(vWefiBalance),
         lockedTokens: toEther(lockedTokens),
-        rWeifTotal: rWeifTotal,
+        rWeifTotal: toEther(rWeifTotal),
         releaseable_vWefiBalance: toEther(releaseable_vWefiBalance),
         vWefiLockedDuration: Math.ceil(vWefiLockedDuration / SECONDS_IN_DAY),
         stakeRewardDuration: Math.ceil(stakeRewardDuration / SECONDS_IN_DAY),
@@ -351,7 +351,7 @@ const Dashboard = () => {
       const stakeTokens = () => {
         // stake tokens
         rWefiContractInstance.methods
-          .registerTokens(value)
+          .registerTokens(web3Instance.utils.toWei(value.toString(), "ether"))
           .send({ from: account })
           .once("transactionHash", async function (txHash) {
             onTxHash({ setModalText, txHash });

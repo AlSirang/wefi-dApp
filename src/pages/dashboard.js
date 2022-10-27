@@ -12,6 +12,12 @@ import {
   vWEFIContract,
   wefiTokenContract,
 } from "../utils/contract.configs";
+import TransactionModal, {
+  onPending,
+  onRejected,
+  onSuccess,
+  onTxHash,
+} from "../components/transactionModal";
 
 let setTimeoutId = null;
 const SECONDS_IN_DAY = 60 * 60 * 24;
@@ -22,6 +28,7 @@ const Dashboard = () => {
       account,
       isCorrectChain,
       isWalletConnected,
+      wefiContractInstance,
       vWefiContractInstance,
       rWefiContractInstance,
       web3Instance,
@@ -32,8 +39,18 @@ const Dashboard = () => {
   const toEther = (value) =>
     Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(0);
 
-  const copyIconRef = useRef();
+  /***** Local States *****/
+  const [modalText, setModalText] = useState(null);
 
+  const [txStatus, setTxStatus] = useState(null);
+  /*************/
+
+  const onModalClose = () => {
+    setModalText(null);
+    setTxStatus(null);
+  };
+
+  const copyIconRef = useRef();
   const onCopy = (paload) => {
     navigator.clipboard.writeText(paload).then(
       function () {
@@ -170,34 +187,34 @@ const Dashboard = () => {
 
       const { results } = await multicall.call(contractCallContext);
 
-      console.log({ results });
-      const wefiBalance = Number(
+      const wefiBalance = parseInt(
         results.wefiTokenContract.callsReturnContext[0].returnValues[0].hex
-      );
-      const referralCode = Number(
+      ).toLocaleString("fullwide", { useGrouping: false });
+
+      const referralCode = parseInt(
         results.presaleContract.callsReturnContext[0].returnValues[0].hex
-      );
-      const rWefiBalance = Number(
+      ).toLocaleString("fullwide", { useGrouping: false });
+      const rWefiBalance = parseInt(
         results.rWefiContract.callsReturnContext[0].returnValues[0].hex
-      );
-      const stakeRewardDuration = Number(
+      ).toLocaleString("fullwide", { useGrouping: false });
+      const stakeRewardDuration = parseInt(
         results.rWefiContract.callsReturnContext[1].returnValues[0].hex
       );
-      const rWeifTotal = Number(
+      const rWeifTotal = parseInt(
         results.rWefiContract.callsReturnContext[2].returnValues[0].hex
-      );
-      const rWefiClaimable = Number(
+      ).toLocaleString("fullwide", { useGrouping: false });
+      const rWefiClaimable = parseInt(
+        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
+      ).toLocaleString("fullwide", { useGrouping: false });
+      const rWefiClaimDuration = parseInt(
         results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
       );
-      const rWefiClaimDuration = Number(
-        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
-      );
-      const vWefiBalance = Number(
+      const vWefiBalance = parseInt(
         results.vwefiTokenContract.callsReturnContext[0].returnValues[0].hex
-      );
-      const lockedTokens = Number(
+      ).toLocaleString("fullwide", { useGrouping: false });
+      const lockedTokens = parseInt(
         results.vwefiTokenContract.callsReturnContext[1].returnValues[0].hex
-      );
+      ).toLocaleString("fullwide", { useGrouping: false });
 
       let releaseable_vWefiBalance =
         results.vwefiTokenContract.callsReturnContext[2].returnValues[0]?.hex ||
@@ -206,21 +223,22 @@ const Dashboard = () => {
         results.vwefiTokenContract.callsReturnContext[3].returnValues[0]?.hex ||
         0;
 
-      releaseable_vWefiBalance = Number(releaseable_vWefiBalance || 0);
-      vWefiLockedDuration = Number(vWefiLockedDuration || 0);
+      releaseable_vWefiBalance = parseInt(
+        releaseable_vWefiBalance || 0
+      ).toLocaleString("fullwide", { useGrouping: false });
+      vWefiLockedDuration = parseInt(vWefiLockedDuration || 0);
 
       setState((p) => ({
         ...p,
         referralCode,
         wefiBalance: toEther(wefiBalance),
-        rWefiBalance: toEther(rWefiBalance),
+        rWefiBalance: rWefiBalance,
         vWefiBalance: toEther(vWefiBalance),
         lockedTokens: toEther(lockedTokens),
-        rWeifTotal: toEther(rWeifTotal),
+        rWeifTotal: rWeifTotal,
         releaseable_vWefiBalance: toEther(releaseable_vWefiBalance),
         vWefiLockedDuration: Math.ceil(vWefiLockedDuration / SECONDS_IN_DAY),
         stakeRewardDuration: Math.ceil(stakeRewardDuration / SECONDS_IN_DAY),
-
         rWefiClaimable: toEther(rWefiClaimable),
         rWefiClaimDuration: rWefiClaimDuration / SECONDS_IN_DAY,
       }));
@@ -239,73 +257,211 @@ const Dashboard = () => {
   }, [account, isContractInitialized, isCorrectChain, isWalletConnected]);
 
   const claimFromAllVestings = () => {
-    vWefiContractInstance.methods
-      .claimFromAllVestings()
-      .send({ from: account })
-      .once("transactionHash", async function (txHash) {})
-      .once("receipt", async (receipt) => {
-        loadData();
-      })
-      .on("error", (err) => {});
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+      vWefiContractInstance.methods
+        .claimFromAllVestings()
+        .send({ from: account })
+        .once("transactionHash", async function (txHash) {
+          onTxHash({ setModalText, txHash });
+        })
+        .once("receipt", async (receipt) => {
+          loadData();
+          const { transactionHash } = receipt;
+          onSuccess({
+            setModalText,
+            setTxStatus,
+            txHash: transactionHash,
+          });
+        })
+        .on("error", (err) => {
+          onRejected({
+            setModalText,
+            setTxStatus,
+            reason: err.message || err,
+          });
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
   };
 
   const claimRWEFI = () => {
-    rWefiContractInstance.methods
-      .claimRewards()
-      .send({ from: account })
-      .once("transactionHash", async function (txHash) {})
-      .once("receipt", async (receipt) => {
-        loadData();
-      })
-      .on("error", (err) => {});
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+      rWefiContractInstance.methods
+        .claimRewards()
+        .send({ from: account })
+        .once("transactionHash", async function (txHash) {
+          onTxHash({ setModalText, txHash });
+        })
+        .once("receipt", async (receipt) => {
+          loadData();
+          const { transactionHash } = receipt;
+          onSuccess({
+            setModalText,
+            setTxStatus,
+            txHash: transactionHash,
+          });
+        })
+        .on("error", (err) => {
+          onRejected({
+            setModalText,
+            setTxStatus,
+            reason: err.message || err,
+          });
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
   };
 
-  const [
-    {
-      toRegister,
-      //toUnregister
-    },
-    setInputs,
-  ] = useState({
+  const [{ toRegister }, setInputs] = useState({
     toRegister: "",
-    // toUnregister: "",
   });
 
   const onInputChange = (e) => {
     const { value } = e.target;
-    // if (name === "registerWEFI")
     setInputs({
       toRegister: value,
-      //toUnregister: ""
     });
-    // return setInputs({ toRegister: "", toUnregister: value });
   };
+
   const registerTokens = (value) => {
-    rWefiContractInstance.methods
-      .registerTokens(value)
-      .send({ from: account })
-      .once("transactionHash", async function (txHash) {})
-      .once("receipt", async (receipt) => {
-        loadData();
-      })
-      .on("error", (err) => {});
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+
+      const stakeTokens = () => {
+        // stake tokens
+        rWefiContractInstance.methods
+          .registerTokens(value)
+          .send({ from: account })
+          .once("transactionHash", async function (txHash) {
+            onTxHash({ setModalText, txHash });
+          })
+          .once("receipt", async (receipt) => {
+            loadData();
+            setInputs({
+              toRegister: "",
+            });
+
+            const { transactionHash } = receipt;
+            onSuccess({
+              setModalText,
+              setTxStatus,
+              txHash: transactionHash,
+            });
+          })
+          .on("error", (err) => {
+            onRejected({
+              setModalText,
+              setTxStatus,
+              reason: err.message || err,
+            });
+          });
+      };
+
+      wefiContractInstance.methods
+        .allowance(account, rWEFIContract.address)
+        .call()
+        .then((allowance) => {
+          // if allowance is less than stake amount ask for approve
+          if (allowance < value) {
+            return wefiContractInstance.methods
+              .approve(
+                rWEFIContract.address,
+                web3Instance.utils.toWei(
+                  (1e50).toLocaleString("fullwide", { useGrouping: false })
+                )
+              )
+              .send({ from: account })
+
+              .once("transactionHash", async function (txHash) {
+                onTxHash({ setModalText, txHash });
+              })
+              .once("receipt", async (receipt) => {
+                stakeTokens();
+              })
+              .on("error", (err) => {
+                onRejected({
+                  setModalText,
+                  setTxStatus,
+                  reason: err.message || err,
+                });
+              });
+          }
+
+          // else just run stake function
+          stakeTokens();
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
   };
+
   const unregisterTokens = () => {
-    rWefiContractInstance.methods
-      .unregisterTokens()
-      .send({ from: account })
-      .once("transactionHash", async function (txHash) {})
-      .once("receipt", async (receipt) => {
-        loadData();
-      })
-      .on("error", (err) => {});
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+      rWefiContractInstance.methods
+        .unregisterTokens()
+        .send({ from: account })
+        .once("transactionHash", async function (txHash) {
+          onTxHash({ setModalText, txHash });
+        })
+        .once("receipt", async (receipt) => {
+          loadData();
+          const { transactionHash } = receipt;
+          onSuccess({
+            setModalText,
+            setTxStatus,
+            txHash: transactionHash,
+          });
+        })
+        .on("error", (err) => {
+          onRejected({
+            setModalText,
+            setTxStatus,
+            reason: err.message || err,
+          });
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
     registerTokens(toRegister);
-    // if (toUnregister > 0) return unregisterTokens(toUnregister);
   };
+
   return (
     <Layout>
       <div className="container dash-main">
@@ -410,23 +566,10 @@ const Dashboard = () => {
                           type="number"
                           autoComplete="off"
                           required
+                          min="0"
                         />
                         WEFI
                       </h4>
-                    </div>
-                    <div className="inner-row">
-                      {/* <h4 className="dash-sub-heading">Unregister </h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      <input
-                        value={toUnregister}
-                        onChange={onInputChange}
-                        name="unregisterWEFI"
-                        className="inline-input input"
-                        type="number"
-                        autoComplete="off"
-                      />
-                      rWEFI
-                    </h4> */}
                     </div>
                   </div>
                   <div className="container-bottom buttons-grid">
@@ -489,6 +632,12 @@ const Dashboard = () => {
           </FrostedGlassOverlay>
         )}
       </div>
+      <TransactionModal
+        isOpen={Boolean(modalText)}
+        txStatus={txStatus}
+        modalText={modalText}
+        onClose={onModalClose}
+      />
     </Layout>
   );
 };

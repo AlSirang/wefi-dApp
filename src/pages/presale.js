@@ -3,6 +3,12 @@ import Layout from "../components/layout";
 import { Web3UserContext } from "../context";
 import Web3Buttons from "../components/Web3Buttons";
 import coinImage from "../assets/img/coin.png";
+import TransactionModal, {
+  onPending,
+  onRejected,
+  onSuccess,
+  onTxHash,
+} from "../components/transactionModal";
 // import sortImage from "../assets/img/sort.png";
 
 const Presale = () => {
@@ -19,6 +25,17 @@ const Presale = () => {
   const [tokenPrice, setTokenPrice] = useState(0);
 
   const isComponentMounted = useRef(true);
+
+  /***** Local States *****/
+  const [modalText, setModalText] = useState(null);
+
+  const [txStatus, setTxStatus] = useState(null);
+  /*************/
+
+  const onModalClose = () => {
+    setModalText(null);
+    setTxStatus(null);
+  };
 
   useEffect(() => {
     isComponentMounted.current = true;
@@ -84,22 +101,51 @@ const Presale = () => {
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-
     let contractInstance = presaleContractInstance;
 
-    const amountInWei = web3Instance.utils.toWei(bnbAmount.toString(), "ether");
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+      const amountInWei = web3Instance.utils.toWei(
+        bnbAmount.toString(),
+        "ether"
+      );
 
-    const _referralCode = referralCode || 0;
-    contractInstance.methods
-      .buyToken(_referralCode)
-      .send({
-        from: account,
-        value: amountInWei,
-      })
+      const _referralCode = referralCode || 0;
+      contractInstance.methods
+        .buyToken(_referralCode)
+        .send({
+          from: account,
+          value: amountInWei,
+        })
 
-      .once("transactionHash", async function (txHash) {})
-      .once("receipt", async (receipt) => {})
-      .on("error", (err) => {});
+        .once("transactionHash", async function (txHash) {
+          onTxHash({ setModalText, txHash });
+        })
+        .once("receipt", async (receipt) => {
+          const { transactionHash } = receipt;
+          onSuccess({
+            setModalText,
+            setTxStatus,
+            txHash: transactionHash,
+          });
+        })
+        .on("error", (err) => {
+          onRejected({
+            setModalText,
+            setTxStatus,
+            reason: err.message || err,
+          });
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
   };
 
   return (
@@ -228,6 +274,13 @@ const Presale = () => {
           </div>
         </div>
       </div>
+
+      <TransactionModal
+        isOpen={Boolean(modalText)}
+        txStatus={txStatus}
+        modalText={modalText}
+        onClose={onModalClose}
+      />
     </Layout>
   );
 };

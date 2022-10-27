@@ -2,6 +2,16 @@ export const shortenAddress = (address) =>
   `${address.slice(0, 5)}...${address.slice(-5)}`;
 
 export const ACCEPTED_CHAIN_ID = "0x61";
+export const blockExplorerUrl = {
+  "0x61": "https://testnet.bscscan.com",
+  "0x38": "https://bscscan.com",
+};
+
+export const TX_STATUS = {
+  PENDING: "PENDING",
+  FULFILLED: "FULFILLED",
+  REJECTED: "REJECTED",
+};
 
 export const networkConfigs = {
   "0x38": {

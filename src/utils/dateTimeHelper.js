@@ -172,10 +172,10 @@ export function timeConverter(UNIX_timestamp) {
   const year = a.getFullYear();
   const month = months[a.getMonth()];
   const date = a.getDate();
-  const hour = a.getHours();
-  const min = a.getMinutes();
+  // const hour = a.getHours();
+  // const min = a.getMinutes();
   // const sec = a.getSeconds();
-  const time = month + " " + date + ", " + year + " " + hour + ":" + min;
+  const time = month + " " + date + ", " + year;
   return time;
 }
 

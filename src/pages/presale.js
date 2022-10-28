@@ -149,7 +149,7 @@ const Presale = () => {
   };
 
   return (
-    <Layout hideSidebarWalletButton={true}>
+    <Layout>
       <div className="container main-section">
         <div className="row mt-5 right-main-section">
           <div className="col-md-6 right-box-left-col">
@@ -161,7 +161,10 @@ const Presale = () => {
               </h2>
             </div>
 
-            <Web3Buttons walletConnectClasses="buttons-container" />
+            <Web3Buttons
+              hideWalletConnectButton={true}
+              walletConnectClasses="buttons-container"
+            />
 
             {isWalletConnected && isCorrectChain && (
               <form id="checkout-form" onSubmit={onFormSubmit}>

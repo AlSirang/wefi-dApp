@@ -13,6 +13,21 @@ export const TX_STATUS = {
   REJECTED: "REJECTED",
 };
 
+export const firstNPostiveNumbersAfterDecimal = (number, n = 4) => {
+  const [num, decimals] = number.toString().split(".");
+  let finalNumber = num;
+
+  let newDecimals = "";
+
+  for (let i = 0; i < n; i++) {
+    if (decimals && decimals[i] && (decimals[i] > 0 || i < n))
+      newDecimals += decimals[i];
+  }
+
+  if (newDecimals > 0) finalNumber = `${num}.${newDecimals}`;
+
+  return finalNumber;
+};
 export const networkConfigs = {
   "0x38": {
     chainId: "0x38",

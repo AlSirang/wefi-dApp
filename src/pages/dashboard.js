@@ -681,7 +681,9 @@ const Dashboard = () => {
                   <div className="inner-row">
                     <h4 className="dash-sub-heading">Due after</h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {timeConverter(rWefiClaimDuration)}
+                      {rWefiClaimDuration > 0
+                        ? timeConverter(rWefiClaimDuration)
+                        : "-"}
                     </h4>
                   </div>
                 </div>

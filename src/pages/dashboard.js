@@ -41,6 +41,7 @@ const Dashboard = () => {
       rWefiContractInstance,
       web3Instance,
       isContractInitialized,
+      presaleContractInstance,
     },
   } = Web3UserContext();
 
@@ -86,6 +87,7 @@ const Dashboard = () => {
       rWeifTotal,
       rWefiClaimable,
       rWefiClaimDuration,
+      isDataLoaded,
     },
     setState,
   ] = useState({
@@ -98,6 +100,8 @@ const Dashboard = () => {
     rWeifTotal: 0,
     rWefiClaimable: 0,
     rWefiClaimDuration: 0,
+
+    isDataLoaded: false,
   });
 
   const loadData = async () => {
@@ -240,6 +244,7 @@ const Dashboard = () => {
         stakeRewardDuration: Math.floor(stakeRewardDuration / SECONDS_IN_DAY),
         rWefiClaimable: toEther(rWefiClaimable),
         rWefiClaimDuration,
+        isDataLoaded: true,
       }));
     } catch (err) {
       console.log({ loadDataErr: err });
@@ -255,6 +260,51 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, isContractInitialized, isCorrectChain, isWalletConnected]);
 
+  const generateReferralCode = () => {
+    try {
+      onPending({
+        setModalText,
+        setTxStatus,
+      });
+
+      presaleContractInstance.methods
+        .generateReferralCode(account)
+        .send({
+          from: account,
+        })
+        .once("transactionHash", async function (txHash) {
+          onTxHash({ setModalText, txHash });
+        })
+        .once("receipt", async (receipt) => {
+          const { transactionHash } = receipt;
+          const referralCode =
+            receipt.events.ReferralCodeGenerated.returnValues[1];
+
+          onSuccess({
+            setModalText,
+            setTxStatus,
+            txHash: transactionHash,
+          });
+          setState((p) => ({
+            ...p,
+            referralCode,
+          }));
+        })
+        .on("error", (err) => {
+          onRejected({
+            setModalText,
+            setTxStatus,
+            reason: err.message || "Transaction has been reverted by the EVM",
+          });
+        });
+    } catch (err) {
+      onRejected({
+        setModalText,
+        setTxStatus,
+        reason: err.message || err,
+      });
+    }
+  };
   const claimFromAllVestings = () => {
     try {
       onPending({
@@ -466,7 +516,7 @@ const Dashboard = () => {
     <Layout>
       <div className="container dash-main">
         <div className="referral-container">
-          {referralCode && (
+          {Boolean(Number(referralCode)) && (
             <h2 className="dash-sub-heading">
               Referral Code: {referralCode}&nbsp;
               <span
@@ -476,6 +526,16 @@ const Dashboard = () => {
                 <i ref={copyIconRef} className="fas fa-copy"></i>
               </span>
             </h2>
+          )}
+
+          {isDataLoaded && !Boolean(Number(referralCode)) && (
+            <button
+              onClick={generateReferralCode}
+              style={{ maxWidth: 200 }}
+              className="button-base secondary-button "
+            >
+              Get referral code
+            </button>
           )}
         </div>
         <div className="row grid-gap">
@@ -551,7 +611,9 @@ const Dashboard = () => {
                     </div>
 
                     <div className="inner-row">
-                      <h4 className="dash-sub-heading">Registered rWEFI</h4>
+                      <h4 className="dash-sub-heading">
+                        Registered WEFI (rWEFI)
+                      </h4>
                       <h4 className="dash-text dash-sub-heading">
                         {firstNPostiveNumbersAfterDecimal(rWefiBalance)}
                       </h4>

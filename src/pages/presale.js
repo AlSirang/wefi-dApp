@@ -136,7 +136,7 @@ const Presale = () => {
           onRejected({
             setModalText,
             setTxStatus,
-            reason: err.message || err,
+            reason: err.message || "Transaction has been reverted by the EVM",
           });
         });
     } catch (err) {
@@ -189,14 +189,6 @@ const Presale = () => {
                           value={bnbAmount}
                         />
                       </span>
-
-                      {/* <div className="icon-container">
-                        <img
-                          className="sort-icon"
-                          src={sortImage}
-                          alt="sort icon"
-                        />
-                      </div> */}
 
                       <span>
                         <label className="input-label" htmlFor="wefiAmount ">

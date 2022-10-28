@@ -1,10 +1,10 @@
 import Header from "./header";
 import Sidebar from "./sidebar";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, hideSidebarWalletButton = false }) => {
   return (
     <div className="row">
-      <Sidebar />
+      <Sidebar hideWalletConnectButton={hideSidebarWalletButton} />
 
       <div className="col-10 col-md-9 col-sm-12 overlay-container right-section">
         <Header />

@@ -149,7 +149,7 @@ const Presale = () => {
   };
 
   return (
-    <Layout>
+    <Layout hideSidebarWalletButton={true}>
       <div className="container main-section">
         <div className="row mt-5 right-main-section">
           <div className="col-md-6 right-box-left-col">

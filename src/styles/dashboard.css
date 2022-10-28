@@ -118,3 +118,8 @@ input.inline-input {
   position: absolute;
   padding: 20px;
 }
+
+input.slim-input {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}

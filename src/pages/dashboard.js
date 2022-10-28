@@ -18,6 +18,8 @@ import TransactionModal, {
   onSuccess,
   onTxHash,
 } from "../components/transactionModal";
+import { firstNPostiveNumbersAfterDecimal } from "../utils/constants";
+import { timeConverter } from "../utils/dateTimeHelper";
 
 // todo:
 
@@ -43,7 +45,7 @@ const Dashboard = () => {
   } = Web3UserContext();
 
   const toEther = (value) =>
-    Number(web3Instance.utils.fromWei(value.toString(), "ether")).toFixed(2);
+    Number(web3Instance.utils.fromWei(value.toString(), "ether"));
 
   /***** Local States *****/
   const [modalText, setModalText] = useState(null);
@@ -78,12 +80,12 @@ const Dashboard = () => {
       wefiBalance,
       rWefiBalance,
       vWefiBalance,
-      lockedTokens,
       releaseable_vWefiBalance,
       vWefiLockedDuration,
       stakeRewardDuration,
       rWeifTotal,
       rWefiClaimable,
+      rWefiClaimDuration,
     },
     setState,
   ] = useState({
@@ -91,7 +93,6 @@ const Dashboard = () => {
     wefiBalance: 0,
     rWefiBalance: 0,
     vWefiBalance: 0,
-    lockedTokens: 0,
     releaseable_vWefiBalance: 0,
     vWefiLockedDuration: 0,
     rWeifTotal: 0,
@@ -151,11 +152,6 @@ const Dashboard = () => {
             },
             {
               reference: "rwefiContract",
-              methodName: "totalSupply",
-              methodParameters: [],
-            },
-            {
-              reference: "rwefiContract",
               methodName: "viewClaimableRewardsAndReleaseTime",
               methodParameters: [account],
             },
@@ -172,11 +168,7 @@ const Dashboard = () => {
               methodName: "balanceOf",
               methodParameters: [account],
             },
-            {
-              reference: "vWefiContract",
-              methodName: "totalSupply",
-              methodParameters: [],
-            },
+
             {
               reference: "vWefiContract",
               methodName: "computeAllReleasableAmountForBeneficiary",
@@ -193,40 +185,42 @@ const Dashboard = () => {
 
       const { results } = await multicall.call(contractCallContext);
 
+      // wefi token contract
       const wefiBalance = parseInt(
         results.wefiTokenContract.callsReturnContext[0].returnValues[0].hex
       ).toLocaleString("fullwide", { useGrouping: false });
-
+      // presale contract
       const referralCode = parseInt(
         results.presaleContract.callsReturnContext[0].returnValues[0].hex
       ).toLocaleString("fullwide", { useGrouping: false });
+
+      // Rewards contract values
       const rWefiBalance = parseInt(
         results.rWefiContract.callsReturnContext[0].returnValues[0].hex
       ).toLocaleString("fullwide", { useGrouping: false });
+
       const stakeRewardDuration = parseInt(
         results.rWefiContract.callsReturnContext[1].returnValues[0].hex
       );
-      const rWeifTotal = parseInt(
-        results.rWefiContract.callsReturnContext[2].returnValues[0].hex
-      ).toLocaleString("fullwide", { useGrouping: false });
+
       const rWefiClaimable = parseInt(
-        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
+        results.rWefiContract.callsReturnContext[2].returnValues[0]?.hex || 0
       ).toLocaleString("fullwide", { useGrouping: false });
+
       const rWefiClaimDuration = parseInt(
-        results.rWefiContract.callsReturnContext[3].returnValues[0]?.hex || 0
+        results.rWefiContract.callsReturnContext[2].returnValues[1]?.hex || 0
       );
+
+      // vesting contract values
       const vWefiBalance = parseInt(
         results.vwefiTokenContract.callsReturnContext[0].returnValues[0].hex
       ).toLocaleString("fullwide", { useGrouping: false });
-      const lockedTokens = parseInt(
-        results.vwefiTokenContract.callsReturnContext[1].returnValues[0].hex
-      ).toLocaleString("fullwide", { useGrouping: false });
 
       let releaseable_vWefiBalance =
-        results.vwefiTokenContract.callsReturnContext[2].returnValues[0]?.hex ||
+        results.vwefiTokenContract.callsReturnContext[1].returnValues[0]?.hex ||
         0;
       let vWefiLockedDuration =
-        results.vwefiTokenContract.callsReturnContext[3].returnValues[0]?.hex ||
+        results.vwefiTokenContract.callsReturnContext[2].returnValues[4]?.hex ||
         0;
 
       releaseable_vWefiBalance = parseInt(
@@ -237,16 +231,15 @@ const Dashboard = () => {
       setState((p) => ({
         ...p,
         referralCode,
-        wefiBalance: toEther(wefiBalance),
+        wefiBalance: toEther(wefiBalance, 4),
         rWefiBalance: toEther(rWefiBalance),
         vWefiBalance: toEther(vWefiBalance),
-        lockedTokens: toEther(lockedTokens),
         rWeifTotal: toEther(rWeifTotal),
         releaseable_vWefiBalance: toEther(releaseable_vWefiBalance),
         vWefiLockedDuration: Math.ceil(vWefiLockedDuration / SECONDS_IN_DAY),
-        stakeRewardDuration: Math.ceil(stakeRewardDuration / SECONDS_IN_DAY),
+        stakeRewardDuration: Math.floor(stakeRewardDuration / SECONDS_IN_DAY),
         rWefiClaimable: toEther(rWefiClaimable),
-        rWefiClaimDuration: rWefiClaimDuration / SECONDS_IN_DAY,
+        rWefiClaimDuration,
       }));
     } catch (err) {
       console.log({ loadDataErr: err });
@@ -287,7 +280,7 @@ const Dashboard = () => {
           onRejected({
             setModalText,
             setTxStatus,
-            reason: err.message || err,
+            reason: err.message || "Transaction has been reverted by the EVM",
           });
         });
     } catch (err) {
@@ -324,7 +317,7 @@ const Dashboard = () => {
           onRejected({
             setModalText,
             setTxStatus,
-            reason: err.message || err,
+            reason: err.message || "Transaction has been reverted by the EVM",
           });
         });
     } catch (err) {
@@ -379,7 +372,7 @@ const Dashboard = () => {
             onRejected({
               setModalText,
               setTxStatus,
-              reason: err.message || err,
+              reason: err.message || "Transaction has been reverted by the EVM",
             });
           });
       };
@@ -409,7 +402,8 @@ const Dashboard = () => {
                 onRejected({
                   setModalText,
                   setTxStatus,
-                  reason: err.message || err,
+                  reason:
+                    err.message || "Transaction has been reverted by the EVM",
                 });
               });
           }
@@ -451,7 +445,7 @@ const Dashboard = () => {
           onRejected({
             setModalText,
             setTxStatus,
-            reason: err.message || err,
+            reason: err.message || "Transaction has been reverted by the EVM",
           });
         });
     } catch (err) {
@@ -490,7 +484,9 @@ const Dashboard = () => {
               <div className="box-1-container">
                 <h3 className="dash-heading">Amount of WEFI Tokens</h3>
 
-                <h4 className="dash-text dash-heading">{wefiBalance}</h4>
+                <h4 className="dash-text dash-heading">
+                  {firstNPostiveNumbersAfterDecimal(wefiBalance)}
+                </h4>
               </div>
             </DashboardBox>
           </div>
@@ -500,15 +496,17 @@ const Dashboard = () => {
               <div className="inner-container">
                 <div className="container-top">
                   <div className="inner-row">
-                    <h4 className="dash-sub-heading"> Amount of vWEFI</h4>
+                    <h4 className="dash-sub-heading">Vested WEFI (vWEFI)</h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {vWefiBalance}
+                      {firstNPostiveNumbersAfterDecimal(vWefiBalance)}
                     </h4>
                   </div>
                   <div className="inner-row">
-                    <h4 className="dash-sub-heading">Available vWEFI</h4>
+                    <h4 className="dash-sub-heading">Claimable vWEFI</h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {releaseable_vWefiBalance}
+                      {firstNPostiveNumbersAfterDecimal(
+                        releaseable_vWefiBalance
+                      )}
                     </h4>
                   </div>
                   <div className="inner-row">
@@ -516,17 +514,10 @@ const Dashboard = () => {
                     <h4 className="dash-text dash-sub-heading">01/15/2023</h4>
                   </div>
                   <div className="inner-row">
-                    <h4 className="dash-sub-heading">Locked For </h4>
+                    <h4 className="dash-sub-heading">Last Vested Duration </h4>
                     <h4 className="dash-text dash-sub-heading">
                       {vWefiLockedDuration} Day
                       {vWefiLockedDuration > 1 ? "s" : ""}
-                    </h4>
-                  </div>
-
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">vWEFI Locked </h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {lockedTokens}
                     </h4>
                   </div>
                 </div>
@@ -548,34 +539,50 @@ const Dashboard = () => {
                 <div className="inner-container">
                   <div className="container-top">
                     <div className="inner-row">
-                      <h4 className="dash-sub-heading">Reward Member For </h4>
-                      <h4 className="dash-text dash-sub-heading">
+                      <h4 className="dash-sub-heading">
+                        Register Duration for Rewards
+                      </h4>
+                      <h4
+                        className="dash-text dash-sub-heading"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
                         {stakeRewardDuration} Days
                       </h4>
                     </div>
 
                     <div className="inner-row">
-                      <h4 className="dash-sub-heading"> Amount of rWEFI</h4>
+                      <h4 className="dash-sub-heading">Registered rWEFI</h4>
                       <h4 className="dash-text dash-sub-heading">
-                        {rWefiBalance}
+                        {firstNPostiveNumbersAfterDecimal(rWefiBalance)}
                       </h4>
                     </div>
 
-                    <div className="inner-row">
-                      <h4 className="dash-sub-heading">Register </h4>
-                      <h4 className="dash-text dash-sub-heading">
-                        <input
-                          value={toRegister}
-                          onChange={onInputChange}
-                          name="registerWEFI"
-                          className="inline-input input"
-                          type="number"
-                          autoComplete="off"
-                          required
-                          min="0"
-                        />
-                        WEFI
+                    <div
+                      className="inner-row mt-4"
+                      style={{
+                        alignItems: "center",
+                      }}
+                    >
+                      <h4
+                        className="dash-sub-heading"
+                        style={{
+                          width: "70%",
+                        }}
+                      >
+                        WEFI to Register
                       </h4>
+                      <input
+                        value={toRegister}
+                        onChange={onInputChange}
+                        name="registerWEFI"
+                        className="form-control input slim-input"
+                        type="number"
+                        autoComplete="off"
+                        placeholder="0"
+                        required
+                        step="any"
+                        min="0"
+                      />
                     </div>
                   </div>
                   <div className="container-bottom buttons-grid">
@@ -602,14 +609,18 @@ const Dashboard = () => {
               <div className="inner-container">
                 <div className="container-top">
                   <div className="inner-row">
-                    <h4 className="dash-sub-heading">Eligible rWEFI </h4>
+                    <h4 className="dash-sub-heading">
+                      Claimable Rewards (WEFI)
+                    </h4>
                     <h4 className="dash-text dash-sub-heading">
-                      {rWefiClaimable}
+                      {firstNPostiveNumbersAfterDecimal(rWefiClaimable)}
                     </h4>
                   </div>
                   <div className="inner-row">
-                    <h4 className="dash-sub-heading">Total rWEFI</h4>
-                    <h4 className="dash-text dash-sub-heading">{rWeifTotal}</h4>
+                    <h4 className="dash-sub-heading">Due after</h4>
+                    <h4 className="dash-text dash-sub-heading">
+                      {timeConverter(rWefiClaimDuration)}
+                    </h4>
                   </div>
                 </div>
 

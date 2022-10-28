@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { WalletConnect } from "./buttons";
 
-const Sidebar = ({ hideWalletConnectButton = false }) => {
+const Sidebar = () => {
   const navigation = useNavigate();
   const navigateToPresale = () => {
     navigation("/");
@@ -19,9 +19,8 @@ const Sidebar = ({ hideWalletConnectButton = false }) => {
 
             <div className="col-12 mt-5 np">
               <div className="buttons-container">
-                {!hideWalletConnectButton && (
-                  <WalletConnect className="button-base secondary-button connect-wallet" />
-                )}
+                <WalletConnect className="button-base secondary-button connect-wallet" />
+
                 <button
                   onClick={navigateToPresale}
                   className="button-base primary-button"

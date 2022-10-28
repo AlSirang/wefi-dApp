@@ -19,7 +19,7 @@ const vWEFIContract = {
 };
 
 const rWEFIContract = {
-  address: "0x3AEF605f8362340F61e7E76016f84CAE3fd813f3",
+  address: "0xf850E8062C6D8102D579fc5A8671de86ab44f786",
   abi: rWefiAbi,
 };
 export { presaleContract, wefiTokenContract, vWEFIContract, rWEFIContract };

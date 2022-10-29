@@ -240,7 +240,7 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
 
   const [{ currentPage, vestingSchedulesInfo, onLoading }, setState] = useState(
     {
-      currentPage: 10,
+      currentPage: 0,
       vestingSchedulesInfo: [],
       onLoading: false,
     }
@@ -258,7 +258,7 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
 
       const calls = [];
 
-      for (let i = 0; i < to; i++) {
+      for (let i = vestingCount - 1; i >= to; i--) {
         calls.push({
           reference: "vWefiContract",
           methodName: "getVestingScheduleByBeneficiaryAndIndex",
@@ -317,6 +317,7 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
       setState((p) => ({
         ...p,
         vestingSchedulesInfo,
+        currentPage: vestingCount - perPage,
       }));
     } catch (e) {
       console.log({ e });
@@ -326,15 +327,15 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
   };
 
   useEffect(() => {
-    account && vestingCount && loadVestingScheulesInfo(perPage);
+    account && vestingCount && loadVestingScheulesInfo(vestingCount - perPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, vestingCount]);
 
   // pagination loadMore
   const onLoadMore = async () => {
-    let newPage = currentPage + perPage;
+    let newPage = currentPage - perPage;
 
-    const toPage = newPage > vestingCount ? vestingCount : newPage;
+    const toPage = newPage < 0 ? 0 : newPage;
 
     await loadVestingScheulesInfo(toPage);
     setState((p) => ({
@@ -372,7 +373,7 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
         </div>
       </div>
 
-      {!onLoading && currentPage < vestingCount && (
+      {!onLoading && currentPage > 0 && (
         <div className="text-center mt-3">
           <button
             onClick={onLoadMore}

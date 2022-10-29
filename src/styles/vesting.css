@@ -1,0 +1,9 @@
+.flex-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.flex-center h4 {
+  margin-top: 0.5rem;
+}

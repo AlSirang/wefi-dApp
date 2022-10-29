@@ -9,7 +9,6 @@ import "../styles/dashboard.css";
 import {
   presaleContract,
   rWEFIContract,
-  vWEFIContract,
   wefiTokenContract,
 } from "../utils/contract.configs";
 import TransactionModal, {
@@ -18,8 +17,12 @@ import TransactionModal, {
   onSuccess,
   onTxHash,
 } from "../components/transactionModal";
-import { firstNPostiveNumbersAfterDecimal } from "../utils/constants";
+import {
+  firstNPostiveNumbersAfterDecimal,
+  SECONDS_IN_DAY,
+} from "../utils/constants";
 import { timeConverter } from "../utils/dateTimeHelper";
+import VestingInfo from "../components/vestingInfo";
 
 // todo:
 
@@ -28,7 +31,6 @@ import { timeConverter } from "../utils/dateTimeHelper";
 // use gaseEstimate function from web3.
 
 let setTimeoutId = null;
-const SECONDS_IN_DAY = 60 * 60 * 24;
 
 const Dashboard = () => {
   const {
@@ -37,7 +39,6 @@ const Dashboard = () => {
       isCorrectChain,
       isWalletConnected,
       wefiContractInstance,
-      vWefiContractInstance,
       rWefiContractInstance,
       web3Instance,
       isContractInitialized,
@@ -50,7 +51,6 @@ const Dashboard = () => {
 
   /***** Local States *****/
   const [modalText, setModalText] = useState(null);
-
   const [txStatus, setTxStatus] = useState(null);
   /*************/
 
@@ -80,9 +80,6 @@ const Dashboard = () => {
       referralCode,
       wefiBalance,
       rWefiBalance,
-      vWefiBalance,
-      releaseable_vWefiBalance,
-      vWefiLockedDuration,
       stakeRewardDuration,
       rWeifTotal,
       rWefiClaimable,
@@ -94,13 +91,9 @@ const Dashboard = () => {
     referralCode: null,
     wefiBalance: 0,
     rWefiBalance: 0,
-    vWefiBalance: 0,
-    releaseable_vWefiBalance: 0,
-    vWefiLockedDuration: 0,
     rWeifTotal: 0,
     rWefiClaimable: 0,
     rWefiClaimDuration: 0,
-
     isDataLoaded: false,
   });
 
@@ -161,30 +154,6 @@ const Dashboard = () => {
             },
           ],
         },
-
-        {
-          reference: "vwefiTokenContract",
-          contractAddress: vWEFIContract.address,
-          abi: vWEFIContract.abi,
-          calls: [
-            {
-              reference: "vWefiContract",
-              methodName: "balanceOf",
-              methodParameters: [account],
-            },
-
-            {
-              reference: "vWefiContract",
-              methodName: "computeAllReleasableAmountForBeneficiary",
-              methodParameters: [account],
-            },
-            {
-              reference: "vWefiContract",
-              methodName: "getLastVestingScheduleForBeneficiary",
-              methodParameters: [account],
-            },
-          ],
-        },
       ];
 
       const { results } = await multicall.call(contractCallContext);
@@ -215,32 +184,12 @@ const Dashboard = () => {
         results.rWefiContract.callsReturnContext[2].returnValues[1]?.hex || 0
       );
 
-      // vesting contract values
-      const vWefiBalance = parseInt(
-        results.vwefiTokenContract.callsReturnContext[0].returnValues[0].hex
-      ).toLocaleString("fullwide", { useGrouping: false });
-
-      let releaseable_vWefiBalance =
-        results.vwefiTokenContract.callsReturnContext[1].returnValues[0]?.hex ||
-        0;
-      let vWefiLockedDuration =
-        results.vwefiTokenContract.callsReturnContext[2].returnValues[4]?.hex ||
-        0;
-
-      releaseable_vWefiBalance = parseInt(
-        releaseable_vWefiBalance || 0
-      ).toLocaleString("fullwide", { useGrouping: false });
-      vWefiLockedDuration = parseInt(vWefiLockedDuration || 0);
-
       setState((p) => ({
         ...p,
         referralCode,
         wefiBalance: toEther(wefiBalance, 4),
         rWefiBalance: toEther(rWefiBalance),
-        vWefiBalance: toEther(vWefiBalance),
         rWeifTotal: toEther(rWeifTotal),
-        releaseable_vWefiBalance: toEther(releaseable_vWefiBalance),
-        vWefiLockedDuration: Math.ceil(vWefiLockedDuration / SECONDS_IN_DAY),
         stakeRewardDuration: Math.floor(stakeRewardDuration / SECONDS_IN_DAY),
         rWefiClaimable: toEther(rWefiClaimable),
         rWefiClaimDuration,
@@ -289,42 +238,6 @@ const Dashboard = () => {
             ...p,
             referralCode,
           }));
-        })
-        .on("error", (err) => {
-          onRejected({
-            setModalText,
-            setTxStatus,
-            reason: err.message || "Transaction has been reverted by the EVM",
-          });
-        });
-    } catch (err) {
-      onRejected({
-        setModalText,
-        setTxStatus,
-        reason: err.message || err,
-      });
-    }
-  };
-  const claimFromAllVestings = () => {
-    try {
-      onPending({
-        setModalText,
-        setTxStatus,
-      });
-      vWefiContractInstance.methods
-        .claimFromAllVestings()
-        .send({ from: account })
-        .once("transactionHash", async function (txHash) {
-          onTxHash({ setModalText, txHash });
-        })
-        .once("receipt", async (receipt) => {
-          loadData();
-          const { transactionHash } = receipt;
-          onSuccess({
-            setModalText,
-            setTxStatus,
-            txHash: transactionHash,
-          });
         })
         .on("error", (err) => {
           onRejected({
@@ -539,7 +452,7 @@ const Dashboard = () => {
           )}
         </div>
         <div className="row grid-gap">
-          <div className="col-lg-6 col-md-12">
+          <div className="col-12">
             <DashboardBox>
               <div className="box-1-container">
                 <h3 className="dash-heading">Amount of WEFI Tokens</h3>
@@ -551,48 +464,6 @@ const Dashboard = () => {
             </DashboardBox>
           </div>
 
-          <div className="col-lg-6 col-md-12">
-            <DashboardBox>
-              <div className="inner-container">
-                <div className="container-top">
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Vested WEFI (vWEFI)</h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {firstNPostiveNumbersAfterDecimal(vWefiBalance)}
-                    </h4>
-                  </div>
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Claimable vWEFI</h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {firstNPostiveNumbersAfterDecimal(
-                        releaseable_vWefiBalance
-                      )}
-                    </h4>
-                  </div>
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Vesting Start Date </h4>
-                    <h4 className="dash-text dash-sub-heading">01/15/2023</h4>
-                  </div>
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Last Vested Duration </h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {vWefiLockedDuration} Day
-                      {vWefiLockedDuration > 1 ? "s" : ""}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="container-bottom">
-                  <button
-                    onClick={claimFromAllVestings}
-                    className="dash-button button-base primary-button "
-                  >
-                    Claim vWEFI
-                  </button>
-                </div>
-              </div>
-            </DashboardBox>
-          </div>
           <div className="col-lg-6 col-md-12">
             <DashboardBox>
               <form onSubmit={onSubmit}>
@@ -699,6 +570,12 @@ const Dashboard = () => {
               </div>
             </DashboardBox>
           </div>
+
+          <div className="col-12">
+            <DashboardBox>
+              <VestingInfo />
+            </DashboardBox>
+          </div>
         </div>
 
         {(!isWalletConnected || !isCorrectChain) && (
@@ -719,6 +596,8 @@ const Dashboard = () => {
         modalText={modalText}
         onClose={onModalClose}
       />
+
+      <div style={{ marginBttom: 30 }} />
     </Layout>
   );
 };

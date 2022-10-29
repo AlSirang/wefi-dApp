@@ -1,6 +1,8 @@
 export const shortenAddress = (address) =>
   `${address.slice(0, 5)}...${address.slice(-5)}`;
 
+export const SECONDS_IN_DAY = 60 * 60 * 24;
+
 export const ACCEPTED_CHAIN_ID = "0x61";
 export const blockExplorerUrl = {
   "0x61": "https://testnet.bscscan.com",

@@ -258,11 +258,11 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
 
       const calls = [];
 
-      for (let i = vestingCount - 1; i >= to; i--) {
+      for (let i = vestingCount; i > to; i--) {
         calls.push({
           reference: "vWefiContract",
           methodName: "getVestingScheduleByBeneficiaryAndIndex",
-          methodParameters: [account, i],
+          methodParameters: [account, i - 1],
         });
       }
 
@@ -327,7 +327,8 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
   };
 
   useEffect(() => {
-    account && vestingCount && loadVestingScheulesInfo(vestingCount - perPage);
+    const initialPages = vestingCount > perPage ? vestingCount - perPage : 0;
+    account && vestingCount && loadVestingScheulesInfo(initialPages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, vestingCount]);
 

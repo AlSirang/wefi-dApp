@@ -193,6 +193,8 @@ const VestingInfo = ({ onTxCompete = () => null }) => {
             </div>
             <div className="col-md-12 col-lg-6 flex-center">
               <button
+                // eslint-disable-next-line eqeqeq
+                disabled={releaseable_vWefiBalance == 0}
                 onClick={claimFromAllVestings}
                 className="dash-button button-base primary-button "
               >
@@ -359,12 +361,16 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
           </div>
         </div>
         <div className="col-12">
+          <hr style={{ marginTop: 5 }} />
+        </div>
+        <div className="col-12">
           {vestingSchedulesInfo.map(
             ({ amountTotalEth, releasedEth, startDate, endDate }, index) => (
               <div className="row" key={index}>
                 <p className="col-1">{index + 1})</p>
                 <p className="col-4  text-center">
-                  {releasedEth} / {amountTotalEth}
+                  {firstNPostiveNumbersAfterDecimal(releasedEth)} /{" "}
+                  {firstNPostiveNumbersAfterDecimal(amountTotalEth)}
                 </p>
                 <p className="col-3">{startDate}</p>
                 <p className="col-4 text-center">{endDate}</p>

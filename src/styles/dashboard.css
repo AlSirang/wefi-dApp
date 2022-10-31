@@ -125,3 +125,9 @@ input.slim-input {
   padding-top: 0px;
   padding-bottom: 0px;
 }
+
+button.button-base.primary-button:disabled,
+button.button-base.primary-button:disabled:hover {
+  background-color: #b3ae4ba1;
+  color: #05070973;
+}

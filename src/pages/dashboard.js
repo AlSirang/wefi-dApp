@@ -561,6 +561,11 @@ const Dashboard = () => {
 
                 <div className="container-bottom">
                   <button
+                    disabled={
+                      // eslint-disable-next-line eqeqeq
+                      rWefiClaimDuration == 0 ||
+                      rWefiClaimDuration * 1000 < Date.now()
+                    }
                     onClick={claimRWEFI}
                     className="dash-button button-base primary-button "
                   >
@@ -573,7 +578,7 @@ const Dashboard = () => {
 
           <div className="col-12">
             <DashboardBox>
-              <VestingInfo />
+              <VestingInfo onTxCompete={loadData} />
             </DashboardBox>
           </div>
         </div>

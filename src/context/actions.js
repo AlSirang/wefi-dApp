@@ -12,6 +12,7 @@ export default function actions(state, dispatch = () => {}) {
       payload: {
         web3Modal,
         Web3,
+        web3PackagesLoaded: true,
       },
     });
   };
@@ -68,10 +69,22 @@ export default function actions(state, dispatch = () => {}) {
     getNetworkInfo(provider, web3Instance);
   };
 
+  const disconnectWallet = async () => {
+    await web3Modal.clearCachedProvider();
+    dispatch({
+      type: TYPES.UPDATE_STATE,
+      payload: {
+        account: null,
+        isWalletConnected: false,
+      },
+    });
+  };
+
   return {
     // custom actions
     initializePackages,
     walletConnect,
+    disconnectWallet,
     getNetworkInfo,
 
     // navtie state and dispatch

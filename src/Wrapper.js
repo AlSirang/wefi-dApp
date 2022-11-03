@@ -1,4 +1,5 @@
 import {
+  useCheckWalletConnection,
   useInitializeContracts,
   useOnAppLoad,
   useOnProviderChange,
@@ -8,6 +9,7 @@ const Wrapper = () => {
   useOnAppLoad();
   useOnProviderChange();
   useInitializeContracts();
+  useCheckWalletConnection();
   return null;
 };
 

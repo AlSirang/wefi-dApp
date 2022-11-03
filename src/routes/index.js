@@ -1,21 +1,21 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Dashboard from "../pages/dashboard";
-import Presale from "../pages/presale";
+import DashboardPage from "../pages/dashboard";
+import PresalePage from "../pages/presale";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Presale />,
+    element: <PresalePage />,
   },
 
   {
     path: "/buy",
-    element: <Presale />,
+    element: <PresalePage />,
   },
 
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: <DashboardPage />,
   },
 ]);
 

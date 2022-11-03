@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Layout from "../components/layout";
-import { Web3UserContext } from "../context";
-import Web3Buttons from "../components/Web3Buttons";
-import coinImage from "../assets/img/coin.png";
+import { Web3UserContext } from "../../context";
+import Web3Buttons from "../../components/Web3Buttons";
+import coinImage from "../../assets/img/coin.png";
 import TransactionModal, {
   onPending,
   onRejected,
   onSuccess,
   onTxHash,
-} from "../components/transactionModal";
+} from "../../components/transactionModal";
 // import sortImage from "../assets/img/sort.png";
 
 const Presale = () => {
@@ -149,7 +148,7 @@ const Presale = () => {
   };
 
   return (
-    <Layout>
+    <>
       <div className="container main-section">
         <div className="row mt-5 right-main-section">
           <div className="col-md-6 right-box-left-col">
@@ -276,7 +275,7 @@ const Presale = () => {
         modalText={modalText}
         onClose={onModalClose}
       />
-    </Layout>
+    </>
   );
 };
 

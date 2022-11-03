@@ -1,28 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { Multicall } from "ethereum-multicall";
-import Layout from "../components/layout";
-import { DashboardBox } from "../components/dasnboard.units";
-import FrostedGlassOverlay from "../components/frostedGlassOverlay";
-import Web3Buttons from "../components/Web3Buttons";
-import { Web3UserContext } from "../context";
-import "../styles/dashboard.css";
+import { DashboardBox } from "../../components/dasnboard.units";
+import FrostedGlassOverlay from "../../components/frostedGlassOverlay";
+import Web3Buttons from "../../components/Web3Buttons";
+import { Web3UserContext } from "../../context";
+import "../../styles/dashboard.css";
 import {
   presaleContract,
   rWEFIContract,
   wefiTokenContract,
-} from "../utils/contract.configs";
+} from "../../utils/contract.configs";
 import TransactionModal, {
   onPending,
   onRejected,
   onSuccess,
   onTxHash,
-} from "../components/transactionModal";
+} from "../../components/transactionModal";
 import {
   firstNPostiveNumbersAfterDecimal,
   SECONDS_IN_DAY,
-} from "../utils/constants";
-import { timeConverter } from "../utils/dateTimeHelper";
-import VestingInfo from "../components/vestingInfo";
+} from "../../utils/constants";
+import { timeConverter } from "../../utils/dateTimeHelper";
+import VestingInfo from "../../components/vestingInfo";
 
 let setTimeoutId = null;
 
@@ -420,7 +419,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout>
+    <>
       <div className="container dash-main">
         <div className="referral-container">
           {Boolean(Number(referralCode)) && (
@@ -597,7 +596,7 @@ const Dashboard = () => {
       />
 
       <div style={{ marginBttom: 30 }} />
-    </Layout>
+    </>
   );
 };
 

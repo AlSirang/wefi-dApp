@@ -24,12 +24,6 @@ import {
 import { timeConverter } from "../utils/dateTimeHelper";
 import VestingInfo from "../components/vestingInfo";
 
-// todo:
-
-// update the tx fee suggestions
-
-// use gaseEstimate function from web3.
-
 let setTimeoutId = null;
 
 const Dashboard = () => {

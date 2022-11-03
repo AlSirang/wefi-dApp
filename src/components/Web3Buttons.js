@@ -42,3 +42,25 @@ const Web3Buttons = ({
 };
 
 export default Web3Buttons;
+
+export const DisconnectWallet = () => {
+  const {
+    disconnectWallet,
+    contextState: { isWalletConnected },
+  } = Web3UserContext();
+
+  return (
+    <>
+      {isWalletConnected && (
+        <>
+          <button
+            className="button-base secondary-button connect-wallet"
+            onClick={disconnectWallet}
+          >
+            Disconnect
+          </button>
+        </>
+      )}
+    </>
+  );
+};

@@ -11,6 +11,7 @@ export const initialState = {
 
   web3Modal: null,
   Web3: null,
+  web3PackagesLoaded: false,
 
   web3Instance: null,
   provider: null,

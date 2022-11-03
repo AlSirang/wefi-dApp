@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Web3UserContext } from "../context";
 import { TYPES } from "../context/reducer";
 import {
@@ -99,4 +99,23 @@ export const useOnProviderChange = () => {
 
     // eslint-disable-next-line
   }, [provider]);
+};
+
+// checks the wallet connection status and update state if wallet is connected on page refresh
+export const useCheckWalletConnection = () => {
+  const hasBeenChecked = useRef(false);
+
+  const {
+    walletConnect,
+    contextState: { web3PackagesLoaded },
+  } = Web3UserContext();
+
+  useEffect(() => {
+    const isConnected = localStorage.getItem("WEB3_CONNECT_CACHED_PROVIDER");
+    if (web3PackagesLoaded && isConnected && !hasBeenChecked.current) {
+      walletConnect();
+      hasBeenChecked.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [web3PackagesLoaded]);
 };

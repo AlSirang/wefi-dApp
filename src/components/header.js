@@ -1,5 +1,7 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { BuyNowButton, WalletConnect } from "./buttons";
+import { DisconnectWallet } from "./Web3Buttons";
 
 const Header = () => {
   const sideMenuRef = useRef(null);
@@ -90,6 +92,13 @@ const Header = () => {
               </li>
             </ul>
           </nav>
+
+          <div className="d-flex flex-column mt-5 gap-3">
+            <WalletConnect className="button-base secondary-button connect-wallet" />
+
+            <DisconnectWallet />
+            <BuyNowButton />
+          </div>
         </div>
       </div>
 

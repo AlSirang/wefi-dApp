@@ -1,11 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import { WalletConnect } from "./buttons";
+import { BuyNowButton, WalletConnect } from "./buttons";
+import { DisconnectWallet } from "./Web3Buttons";
 
 const Sidebar = () => {
-  const navigation = useNavigate();
-  const navigateToPresale = () => {
-    navigation("/");
-  };
   return (
     <div className="col-2 col-md-3 col-sm-12 d-none d-md-block left-section">
       <header className="header header-padding">
@@ -20,13 +16,8 @@ const Sidebar = () => {
             <div className="col-12 mt-5 np">
               <div className="buttons-container">
                 <WalletConnect className="button-base secondary-button connect-wallet" />
-
-                <button
-                  onClick={navigateToPresale}
-                  className="button-base primary-button"
-                >
-                  Buy Now
-                </button>
+                <DisconnectWallet />
+                <BuyNowButton />
               </div>
             </div>
           </div>

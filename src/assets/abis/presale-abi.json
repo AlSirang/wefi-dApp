@@ -51,6 +51,25 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "HeadPromoterCommissionSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -64,25 +83,6 @@
       }
     ],
     "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "ReferralCodeBonusPercentageChanged",
     "type": "event"
   },
   {
@@ -112,15 +112,9 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
-    "name": "ReferralCommissionPercentageChanged",
+    "name": "ReferrerBlacklisted",
     "type": "event"
   },
   {
@@ -139,7 +133,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ReferralCommissionSent",
+    "name": "ReferrerCommissionSent",
     "type": "event"
   },
   {
@@ -171,6 +165,38 @@
       }
     ],
     "name": "ReferrerVestingScheduleChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      },
+      { "indexed": false, "internalType": "uint8", "name": "", "type": "uint8" }
+    ],
+    "name": "ReferrerWhitelisted",
     "type": "event"
   },
   {
@@ -283,46 +309,28 @@
   },
   {
     "inputs": [
-      { "internalType": "uint8", "name": "newPercentage", "type": "uint8" }
-    ],
-    "name": "changeReferralCodeBonusPercentage",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint8", "name": "newPercentage", "type": "uint8" }
-    ],
-    "name": "changeReferralCommissionPercentage",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
       {
         "internalType": "uint256",
-        "name": "referrerVestingCliff_",
+        "name": "referrerAndHeadPromoterVestingCliff_",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "referrerVestingStart_",
+        "name": "referrerAndHeadPromoterVestingStart_",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "referrerVestingDuration_",
+        "name": "referrerAndHeadPromoterVestingDuration_",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "referrerVestingSlicePeriodSeconds_",
+        "name": "referrerAndHeadPromoterVestingSlicePeriodSeconds_",
         "type": "uint256"
       }
     ],
-    "name": "changeReferrerVestingSchedule",
+    "name": "changeReferrerAndHeadPromoterVestingSchedule",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -345,6 +353,15 @@
       }
     ],
     "name": "changeVestingContractAddress",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "referralCode", "type": "uint256" }
+    ],
+    "name": "excludeFromWhitelist",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -393,11 +410,27 @@
   },
   {
     "inputs": [],
-    "name": "getReferrerVestingSchedule",
+    "name": "getReferrerAndHeadPromoterVestingSchedule",
     "outputs": [
       { "internalType": "uint256", "name": "", "type": "uint256" },
       { "internalType": "uint256", "name": "", "type": "uint256" },
       { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "referralCode", "type": "uint256" }
+    ],
+    "name": "getReferrerInfo",
+    "outputs": [
+      { "internalType": "bool", "name": "", "type": "bool" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "uint8", "name": "", "type": "uint8" },
       { "internalType": "uint256", "name": "", "type": "uint256" }
     ],
     "stateMutability": "view",
@@ -418,23 +451,42 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "referrerReferralCode",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "headPromoterReferralCode",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "headPromoterCommissionPercentage",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "referrerCommissionPercentage",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "referralBonusPercentage",
+        "type": "uint8"
+      }
+    ],
+    "name": "includeInWhitelist",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "referralCodeBonusPercentage",
-    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "referralCommissionPercentage",
-    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
     "stateMutability": "view",
     "type": "function"
   },

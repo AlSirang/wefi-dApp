@@ -4,22 +4,22 @@ import vWefiAbi from "../assets/abis/vWefi.abi.json";
 import rWefiAbi from "../assets/abis/rWefi.abi.json";
 
 const presaleContract = {
-  address: "0x43a3766f810686f6025adbD18B5bF7e877ef40Ba",
+  address: "0x2482817262DD26C8e8955962913560fCb8A98934",
   abi: presaleAbi,
 };
 
 const wefiTokenContract = {
-  address: "0xB08eBf48B2f5e6C6a5F2D21D1dfbb7B9B36ca7BB",
+  address: "0x29a11801a2d355c46AF338be6A0B42F32dac220b",
   abi: wefiTokenAbi,
 };
 
 const vWEFIContract = {
-  address: "0xfD086EFB0C83e42fb4B4CCfC6A9690477faE8bab",
+  address: "0x1b6C5F5761C826Ee421c96d39173cA5cc6b39CC8",
   abi: vWefiAbi,
 };
 
 const rWEFIContract = {
-  address: "0x357252347b388aa519AA7A9896420EDbb60e9560",
+  address: "0x8343443d68eA2fb2C6F28b48de433Dc099Ae669F",
   abi: rWefiAbi,
 };
 export { presaleContract, wefiTokenContract, vWEFIContract, rWEFIContract };

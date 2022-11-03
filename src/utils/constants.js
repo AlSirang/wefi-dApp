@@ -3,7 +3,7 @@ export const shortenAddress = (address) =>
 
 export const SECONDS_IN_DAY = 60 * 60 * 24;
 
-export const ACCEPTED_CHAIN_ID = "0x61";
+export const ACCEPTED_CHAIN_ID = "0x38";
 export const blockExplorerUrl = {
   "0x61": "https://testnet.bscscan.com",
   "0x38": "https://bscscan.com",

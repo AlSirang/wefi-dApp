@@ -10,7 +10,7 @@ import TransactionModal, {
   onTxHash,
 } from "./transactionModal";
 import "../styles/vesting.css";
-import { timeConverter } from "../utils/dateTimeHelper";
+import { DateDiff, timeConverter } from "../utils/dateTimeHelper";
 import LineOfDots from "./line-of-dots";
 const VestingInfo = ({ onTxCompete = () => null }) => {
   const {
@@ -308,7 +308,14 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
             Number(durationInUnix) + Number(startDateInUnix)
           );
 
+          const endInUnix = Number(durationInUnix) + Number(startDateInUnix);
+          const cliff = DateDiff.inMonths(
+            new Date(startDateInUnix * 1000),
+            new Date(endInUnix * 1000)
+          );
+
           return {
+            cliff,
             amountTotalEth,
             releasedEth,
             startDate,
@@ -351,13 +358,14 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
       <div className="row">
         <div className="col-12">
           <div className="row">
-            <h5 className="col-1">VS#</h5>
-            <h5 className="col-4 text-center">
+            <h5 className="col-1 text-center">VS#</h5>
+            <h5 className="col-3 text-center">
               Released/Total
               <br /> (vWEFI)
             </h5>
-            <h5 className="col-3">Started date</h5>
-            <h5 className="col-4 text-center">End date</h5>
+            <h5 className="col-3 text-center">Vesting Start date</h5>
+            <h5 className="col-2 text-center">Cliff</h5>
+            <h5 className="col-3 text-center">Vesting End date</h5>
           </div>
         </div>
         <div className="col-12">
@@ -365,15 +373,25 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
         </div>
         <div className="col-12">
           {vestingSchedulesInfo.map(
-            ({ amountTotalEth, releasedEth, startDate, endDate }, index) => (
+            (
+              { amountTotalEth, cliff, releasedEth, startDate, endDate },
+              index
+            ) => (
               <div className="row" key={index}>
-                <p className="col-1">{index + 1})</p>
-                <p className="col-4  text-center">
+                <p className="col-1 text-center">{index + 1})</p>
+                <p className="col-3  text-center">
                   {firstNPostiveNumbersAfterDecimal(releasedEth)} /{" "}
                   {firstNPostiveNumbersAfterDecimal(amountTotalEth)}
                 </p>
-                <p className="col-3">{startDate}</p>
-                <p className="col-4 text-center">{endDate}</p>
+                <p className="col-3 text-center">{startDate}</p>
+                <p className="col-2 text-center">
+                  {cliff}&nbsp;
+                  {
+                    // eslint-disable-next-line eqeqeq
+                    cliff == 1 ? "Month" : "Months"
+                  }
+                </p>
+                <p className="col-3 text-center">{endDate}</p>
               </div>
             )
           )}

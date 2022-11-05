@@ -207,3 +207,16 @@ export const DateDiff = {
     return d2.getFullYear() - d1.getFullYear();
   },
 };
+
+export const getMonthsAndDays = (seconds) => {
+  const monthsCount = Math.floor(seconds / 2629743);
+
+  seconds %= 2629743;
+
+  const daysCount = Math.floor(seconds / (3600 * 24));
+
+  return {
+    monthsCount,
+    daysCount,
+  };
+};

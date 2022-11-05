@@ -1,6 +1,11 @@
 export const shortenAddress = (address) =>
   `${address.slice(0, 5)}...${address.slice(-5)}`;
 
+export const getPlural = (number, word) => {
+  // eslint-disable-next-line eqeqeq
+  return number == 1 ? word : word + "s";
+};
+
 export const SECONDS_IN_DAY = 60 * 60 * 24;
 
 export const ACCEPTED_CHAIN_ID = "0x38";

@@ -1,7 +1,10 @@
 import { Multicall } from "ethereum-multicall";
 import { useEffect, useState } from "react";
 import { Web3UserContext } from "../context";
-import { firstNPostiveNumbersAfterDecimal } from "../utils/constants";
+import {
+  firstNPostiveNumbersAfterDecimal,
+  getPlural,
+} from "../utils/constants";
 import { vWEFIContract } from "../utils/contract.configs";
 import TransactionModal, {
   onPending,
@@ -10,7 +13,7 @@ import TransactionModal, {
   onTxHash,
 } from "./transactionModal";
 import "../styles/vesting.css";
-import { DateDiff, timeConverter } from "../utils/dateTimeHelper";
+import { getMonthsAndDays, timeConverter } from "../utils/dateTimeHelper";
 import LineOfDots from "./line-of-dots";
 const VestingInfo = ({ onTxCompete = () => null }) => {
   const {
@@ -281,7 +284,7 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
 
       const vestingSchedulesInfo =
         results.vwefiTokenContract.callsReturnContext.map((context) => {
-          const [, , , start, duration, , amountTotal, released] =
+          const [, , _cliff, start, duration, , amountTotal, released] =
             context.returnValues;
 
           const amountTotalEth = toEther(
@@ -308,14 +311,15 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
             Number(durationInUnix) + Number(startDateInUnix)
           );
 
-          const endInUnix = Number(durationInUnix) + Number(startDateInUnix);
-          const cliff = DateDiff.inMonths(
-            new Date(startDateInUnix * 1000),
-            new Date(endInUnix * 1000)
-          );
+          let cliff = parseInt(_cliff.hex).toLocaleString("fullwide", {
+            useGrouping: false,
+          });
+
+          const { monthsCount: cliffMoths, daysCount: cliffDays } =
+            getMonthsAndDays((cliff -= startDateInUnix));
 
           return {
-            cliff,
+            cliff: { cliffMoths, cliffDays },
             amountTotalEth,
             releasedEth,
             startDate,
@@ -385,11 +389,11 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
                 </p>
                 <p className="col-3 text-center">{startDate}</p>
                 <p className="col-2 text-center">
-                  {cliff}&nbsp;
-                  {
-                    // eslint-disable-next-line eqeqeq
-                    cliff == 1 ? "Month" : "Months"
-                  }
+                  {cliff.cliffMoths ? cliff.cliffMoths : cliff.cliffDays}&nbsp;
+                  {cliff.cliffMoths
+                    ? getPlural(cliff.cliffMoths, "Month")
+                    : getPlural(cliff.cliffDays, "Day")}
+                  &nbsp;
                 </p>
                 <p className="col-3 text-center">{endDate}</p>
               </div>

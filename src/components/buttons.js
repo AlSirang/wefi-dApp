@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Web3UserContext } from "../context";
+import { ButtonUserContext, Web3UserContext } from "../context";
 import { shortenAddress } from "../utils/constants";
 
 export const WalletConnect = (props) => {
@@ -18,13 +18,17 @@ export const WalletConnect = (props) => {
 };
 
 export const BuyNowButton = () => {
+  const {
+    contextState: { name, path },
+  } = ButtonUserContext();
+
   const navigation = useNavigate();
   const navigateToPresale = () => {
-    navigation("/");
+    navigation(path);
   };
   return (
     <button onClick={navigateToPresale} className="button-base primary-button">
-      Buy Now
+      {name}
     </button>
   );
 };

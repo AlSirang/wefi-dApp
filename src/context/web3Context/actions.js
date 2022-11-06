@@ -1,6 +1,6 @@
 import { loadWeb3Packages, switchNetwork } from "./utils";
 import { TYPES } from "./reducer";
-import { ACCEPTED_CHAIN_ID } from "../utils/constants";
+import { ACCEPTED_CHAIN_ID } from "../../utils/constants";
 
 export default function actions(state, dispatch = () => {}) {
   const { web3Modal, Web3, isWalletConnected } = state;

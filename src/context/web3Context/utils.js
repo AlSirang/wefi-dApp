@@ -1,5 +1,5 @@
-import binanceIcon from "../assets/img/binance-logo.png";
-import { ACCEPTED_CHAIN_ID, networkConfigs } from "../utils/constants";
+import binanceIcon from "../../assets/img/binance-logo.png";
+import { ACCEPTED_CHAIN_ID, networkConfigs } from "../../utils/constants";
 
 // dynamic import to reduce bundle size
 export const loadWeb3Packages = async () => {

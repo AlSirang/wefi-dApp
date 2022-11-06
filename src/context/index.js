@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from "react";
-import actions from "./actions";
-import reducer, { initialState } from "./reducer";
+import actions from "./web3Context/actions";
+import reducer, { initialState } from "./web3Context/reducer";
 
 const Web3Context = createContext({});
 

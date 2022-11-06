@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Web3UserContext } from "../context";
-import { TYPES } from "../context/reducer";
+import { TYPES } from "../context/web3Context/reducer";
 import {
   presaleContract,
   rWEFIContract,

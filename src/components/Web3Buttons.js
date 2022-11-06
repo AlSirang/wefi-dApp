@@ -1,5 +1,5 @@
 import { WalletConnect } from "./buttons";
-import { switchNetwork } from "../context/utils";
+import { switchNetwork } from "../context/web3Context/utils";
 import { Web3UserContext } from "../context";
 
 const Web3Buttons = ({

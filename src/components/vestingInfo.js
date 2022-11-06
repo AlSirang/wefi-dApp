@@ -303,20 +303,19 @@ const VestingInfoList = ({ vestingCount = 0 }) => {
           );
           const startDate = timeConverter(startDateInUnix);
 
-          const durationInUnix = parseInt(duration.hex).toLocaleString(
-            "fullwide",
-            { useGrouping: false }
-          );
-          const endDate = timeConverter(
-            Number(durationInUnix) + Number(startDateInUnix)
-          );
-
-          let cliff = parseInt(_cliff.hex).toLocaleString("fullwide", {
+          const cliff = parseInt(_cliff.hex).toLocaleString("fullwide", {
             useGrouping: false,
           });
 
           const { monthsCount: cliffMoths, daysCount: cliffDays } =
-            getMonthsAndDays((cliff -= startDateInUnix));
+            getMonthsAndDays(cliff - startDateInUnix);
+
+          const durationInUnix = parseInt(duration.hex).toLocaleString(
+            "fullwide",
+            { useGrouping: false }
+          );
+
+          const endDate = timeConverter(Number(cliff) + Number(durationInUnix));
 
           return {
             cliff: { cliffMoths, cliffDays },

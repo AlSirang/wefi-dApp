@@ -23,3 +23,19 @@ const rWEFIContract = {
   abi: rWefiAbi,
 };
 export { presaleContract, wefiTokenContract, vWEFIContract, rWEFIContract };
+
+export const tokenWEFI = {
+  address: "0x29a11801a2d355c46AF338be6A0B42F32dac220b", // The address that the token is at.
+  symbol: "WEFI", // A ticker symbol or shorthand, up to 5 chars.
+  decimals: 18, // The number of decimals in the token
+};
+export const token_rWEFI = {
+  address: "0x8343443d68eA2fb2C6F28b48de433Dc099Ae669F", // The address that the token is at.
+  symbol: "rWEFI", // A ticker symbol or shorthand, up to 5 chars.
+  decimals: 18, // The number of decimals in the token
+};
+export const token_vWEFI = {
+  address: "0x1b6C5F5761C826Ee421c96d39173cA5cc6b39CC8", // The address that the token is at.
+  symbol: "vWEFI", // A ticker symbol or shorthand, up to 5 chars.
+  decimals: 18, // The number of decimals in the token
+};

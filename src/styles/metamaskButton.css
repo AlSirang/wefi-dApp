@@ -1,0 +1,43 @@
+.btn {
+  display: inline-block;
+  font-weight: 500;
+  color: #1e2022;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 5px 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.35rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btnXss {
+  font-size: 0.65625rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.btn-xs,
+.btn-xss {
+  border-radius: 0.25rem;
+}
+
+.btn-soft-light {
+  color: #f8f9fa;
+  background: rgba(248, 249, 250, 0.1);
+  border-color: transparent;
+}
+
+.btn:hover {
+  background: rgba(248, 249, 250, 0.1);
+}
+
+.text-nowrap {
+  white-space: nowrap !important;
+}

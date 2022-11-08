@@ -131,3 +131,21 @@ button.button-base.primary-button:disabled:hover {
   background-color: #b3ae4ba1;
   color: #05070973;
 }
+
+.button-container {
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.button-container-abs {
+  position: absolute;
+  right: -10px;
+  top: 0px;
+}
+
+.box-innerContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}

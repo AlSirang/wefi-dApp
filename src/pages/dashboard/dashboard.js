@@ -8,6 +8,9 @@ import "../../styles/dashboard.css";
 import {
   presaleContract,
   rWEFIContract,
+  tokenWEFI,
+  token_rWEFI,
+  token_vWEFI,
   wefiTokenContract,
 } from "../../utils/contract.configs";
 import TransactionModal, {
@@ -22,6 +25,7 @@ import {
 } from "../../utils/constants";
 import { timeConverter } from "../../utils/dateTimeHelper";
 import VestingInfo from "../../components/vestingInfo";
+import { AssetManagmentButton } from "../../components/buttons";
 
 let setTimeoutId = null;
 
@@ -447,12 +451,23 @@ const Dashboard = () => {
         <div className="row grid-gap">
           <div className="col-12">
             <DashboardBox>
-              <div className="box-1-container">
-                <h3 className="dash-heading">Amount of WEFI Tokens</h3>
+              <div className="box-innerContainer">
+                <div className="box-1-container">
+                  <h3 className="dash-heading">Amount of WEFI Tokens</h3>
 
-                <h4 className="dash-text dash-heading">
-                  {firstNPostiveNumbersAfterDecimal(wefiBalance)}
-                </h4>
+                  <h4 className="dash-text dash-heading">
+                    {firstNPostiveNumbersAfterDecimal(wefiBalance)}
+                  </h4>
+                </div>
+
+                <div className="button-container">
+                  <div className="button-container-abs">
+                    <AssetManagmentButton
+                      name="Add Token WEFI"
+                      options={tokenWEFI}
+                    />
+                  </div>
+                </div>
               </div>
             </DashboardBox>
           </div>
@@ -532,38 +547,49 @@ const Dashboard = () => {
           </div>
           <div className="col-lg-6 col-md-12">
             <DashboardBox>
-              <div className="inner-container">
-                <div className="container-top">
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">
-                      Claimable Rewards (WEFI)
-                    </h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {firstNPostiveNumbersAfterDecimal(rWefiClaimable)}
-                    </h4>
+              <div className="box-innerContainer">
+                <div className="inner-container">
+                  <div className="container-top">
+                    <div className="inner-row">
+                      <h4 className="dash-sub-heading">
+                        Claimable Rewards (WEFI)
+                      </h4>
+                      <h4 className="dash-text dash-sub-heading">
+                        {firstNPostiveNumbersAfterDecimal(rWefiClaimable)}
+                      </h4>
+                    </div>
+                    <div className="inner-row">
+                      <h4 className="dash-sub-heading">Due after</h4>
+                      <h4 className="dash-text dash-sub-heading">
+                        {rWefiClaimDuration > 0
+                          ? timeConverter(rWefiClaimDuration)
+                          : "-"}
+                      </h4>
+                    </div>
                   </div>
-                  <div className="inner-row">
-                    <h4 className="dash-sub-heading">Due after</h4>
-                    <h4 className="dash-text dash-sub-heading">
-                      {rWefiClaimDuration > 0
-                        ? timeConverter(rWefiClaimDuration)
-                        : "-"}
-                    </h4>
+
+                  <div className="container-bottom">
+                    <button
+                      disabled={
+                        // eslint-disable-next-line eqeqeq
+                        rWefiClaimDuration == 0 ||
+                        rWefiClaimDuration * 1000 < Date.now()
+                      }
+                      onClick={claimRWEFI}
+                      className="dash-button button-base primary-button "
+                    >
+                      Claim rWEFI
+                    </button>
                   </div>
                 </div>
 
-                <div className="container-bottom">
-                  <button
-                    disabled={
-                      // eslint-disable-next-line eqeqeq
-                      rWefiClaimDuration == 0 ||
-                      rWefiClaimDuration * 1000 < Date.now()
-                    }
-                    onClick={claimRWEFI}
-                    className="dash-button button-base primary-button "
-                  >
-                    Claim rWEFI
-                  </button>
+                <div className="button-container">
+                  <div className="button-container-abs">
+                    <AssetManagmentButton
+                      name="Add Registered rWEFI"
+                      options={token_rWEFI}
+                    />
+                  </div>
                 </div>
               </div>
             </DashboardBox>
@@ -571,7 +597,20 @@ const Dashboard = () => {
 
           <div className="col-12">
             <DashboardBox>
-              <VestingInfo onTxCompete={loadData} />
+              <div className="box-innerContainer">
+                <div>
+                  <VestingInfo onTxCompete={loadData} />
+                </div>
+
+                <div className="button-container">
+                  <div className="button-container-abs">
+                    <AssetManagmentButton
+                      name="Add Vested vWEFI"
+                      options={token_vWEFI}
+                    />
+                  </div>
+                </div>
+              </div>
             </DashboardBox>
           </div>
         </div>

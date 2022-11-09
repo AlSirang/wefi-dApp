@@ -39,7 +39,6 @@ const Dashboard = () => {
       rWefiContractInstance,
       web3Instance,
       isContractInitialized,
-      presaleContractInstance,
     },
   } = Web3UserContext();
 
@@ -205,52 +204,6 @@ const Dashboard = () => {
       loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, isContractInitialized, isCorrectChain, isWalletConnected]);
-
-  const generateReferralCode = () => {
-    try {
-      onPending({
-        setModalText,
-        setTxStatus,
-      });
-
-      presaleContractInstance.methods
-        .generateReferralCode(account)
-        .send({
-          from: account,
-        })
-        .once("transactionHash", async function (txHash) {
-          onTxHash({ setModalText, txHash });
-        })
-        .once("receipt", async (receipt) => {
-          const { transactionHash } = receipt;
-          const referralCode =
-            receipt.events.ReferralCodeGenerated.returnValues[1];
-
-          onSuccess({
-            setModalText,
-            setTxStatus,
-            txHash: transactionHash,
-          });
-          setState((p) => ({
-            ...p,
-            referralCode,
-          }));
-        })
-        .on("error", (err) => {
-          onRejected({
-            setModalText,
-            setTxStatus,
-            reason: err.message || "Transaction has been reverted by the EVM",
-          });
-        });
-    } catch (err) {
-      onRejected({
-        setModalText,
-        setTxStatus,
-        reason: err.message || err,
-      });
-    }
-  };
 
   const claimRWEFI = () => {
     try {
@@ -439,13 +392,11 @@ const Dashboard = () => {
           )}
 
           {isDataLoaded && !Boolean(Number(referralCode)) && (
-            <button
-              onClick={generateReferralCode}
-              style={{ maxWidth: 200 }}
-              className="button-base secondary-button "
-            >
-              Get referral code
-            </button>
+            <p>
+              Please email to&nbsp;
+              <a href="mailto:info@wefitoken.com">info@wefitoken.com</a>&nbsp;
+              to request your referral code
+            </p>
           )}
         </div>
         <div className="row grid-gap">

@@ -393,7 +393,7 @@ const Dashboard = () => {
 
           {isDataLoaded && !Boolean(Number(referralCode)) && (
             <p>
-              Please email to&nbsp;
+              Please email&nbsp;
               <a href="mailto:info@wefitoken.com">info@wefitoken.com</a>&nbsp;
               to request your referral code
             </p>

@@ -842,7 +842,7 @@ label {
   width: 280px;
   height: 100%;
   background-color: #151920;
-  z-index: 11;
+  z-index: 2;
   border-left: 1px solid #faf47b80;
   transition: 0.3s;
 }

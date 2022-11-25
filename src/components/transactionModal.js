@@ -7,6 +7,7 @@ import {
 import FrostedGlassOverlay from "./frostedGlassOverlay";
 import LineOfDots from "./line-of-dots";
 import errorIcon from "../assets/img/warning.png";
+import Modal from "./modal";
 
 const TransactionModal = ({
   isOpen,
@@ -14,35 +15,37 @@ const TransactionModal = ({
   modalText,
   onClose = () => null,
 }) => {
-  return isOpen ? (
-    <FrostedGlassOverlay>
-      <div className="overlay-content container">
-        <div dangerouslySetInnerHTML={{ __html: modalText }} />
-        <div className="mt-4 w-100">
-          {TX_STATUS.PENDING === txStatus && <LineOfDots />}
-          {TX_STATUS.FULFILLED === txStatus && (
-            <i className="fa-icon fa fa-check-circle-o"></i>
-          )}
-          {TX_STATUS.REJECTED === txStatus && (
-            <img className="icon-img" src={errorIcon} alt="" />
-          )}
-        </div>
+  return (
+    <Modal isOpen={isOpen}>
+      <FrostedGlassOverlay>
+        <div className="overlay-content container">
+          <div dangerouslySetInnerHTML={{ __html: modalText }} />
+          <div className="mt-4 w-100">
+            {TX_STATUS.PENDING === txStatus && <LineOfDots />}
+            {TX_STATUS.FULFILLED === txStatus && (
+              <i className="fa-icon fa fa-check-circle-o"></i>
+            )}
+            {TX_STATUS.REJECTED === txStatus && (
+              <img className="icon-img" src={errorIcon} alt="" />
+            )}
+          </div>
 
-        <div className="mt-3">
-          {(TX_STATUS.REJECTED === txStatus ||
-            TX_STATUS.FULFILLED === txStatus) && (
-            <button
-              className="button-base secondary-button"
-              style={{ maxWidth: 100 }}
-              onClick={onClose}
-            >
-              close
-            </button>
-          )}
+          <div className="mt-3">
+            {(TX_STATUS.REJECTED === txStatus ||
+              TX_STATUS.FULFILLED === txStatus) && (
+              <button
+                className="button-base secondary-button"
+                style={{ maxWidth: 100 }}
+                onClick={onClose}
+              >
+                close
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-    </FrostedGlassOverlay>
-  ) : null;
+      </FrostedGlassOverlay>
+    </Modal>
+  );
 };
 
 export default TransactionModal;

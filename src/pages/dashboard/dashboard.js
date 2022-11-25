@@ -26,6 +26,7 @@ import {
 import { timeConverter } from "../../utils/dateTimeHelper";
 import VestingInfo from "../../components/vestingInfo";
 import { AssetManagmentButton } from "../../components/buttons";
+import Modal from "../../components/modal";
 
 let setTimeoutId = null;
 
@@ -566,7 +567,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {(!isWalletConnected || !isCorrectChain) && (
+        <Modal isOpen={!isWalletConnected || !isCorrectChain}>
           <FrostedGlassOverlay>
             <div className="overlay-content container">
               {!isWalletConnected && (
@@ -576,7 +577,7 @@ const Dashboard = () => {
               <Web3Buttons hideWalletConnectButton={isWalletConnected} />
             </div>
           </FrostedGlassOverlay>
-        )}
+        </Modal>
       </div>
       <TransactionModal
         isOpen={Boolean(modalText)}

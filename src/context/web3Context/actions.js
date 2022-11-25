@@ -71,6 +71,7 @@ export default function actions(state, dispatch = () => {}) {
 
   const disconnectWallet = async () => {
     await web3Modal.clearCachedProvider();
+    localStorage.removeItem("WEB3_CONNECT_CACHED_PROVIDER");
     dispatch({
       type: TYPES.UPDATE_STATE,
       payload: {

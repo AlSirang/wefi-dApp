@@ -55,7 +55,7 @@ export const AssetManagmentButton = ({ name, options }) => {
       onClick={handleClick}
       className="btn btn-xss btn-soft-light text-nowrap d-flex align-items-center mr-2"
     >
-      <img class="mr-1" width="15" src={metamaskIcon} alt="Metamask" />
+      <img className="mr-1" width="15" src={metamaskIcon} alt="Metamask" />
       &nbsp;{name}
     </button>
   );

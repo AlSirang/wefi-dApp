@@ -94,9 +94,10 @@ const Header = () => {
           </nav>
 
           <div className="d-flex flex-column mt-5 gap-3">
-            <WalletConnect className="button-base secondary-button connect-wallet" />
-
-            <DisconnectWallet />
+            <div className="d-flex flex-column gap-3" onClick={onToggle}>
+              <WalletConnect className="button-base secondary-button connect-wallet" />
+              <DisconnectWallet />
+            </div>
             <BuyNowButton />
           </div>
         </div>

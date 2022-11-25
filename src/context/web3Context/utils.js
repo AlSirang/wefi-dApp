@@ -30,9 +30,8 @@ export const loadWeb3Packages = async () => {
       options: {
         infuraId: "12803c9f5919455ba1ac0be83197d502", // required
         chainId: 56,
-        // mobileLinks: ["metamask", "trust", "imtoken"],
+        network: "binance",
         rpc: {
-          4: "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161", // Rinkeby Test Network
           56: "https://bsc-dataseed.binance.org/", // BSC
           97: "https://data-seed-prebsc-2-s1.binance.org:8545", // BSC Testnet
           137: "https://polygon-mainnet.g.alchemy.com/v2/ma3nP6ZZCpI81yCWIBz2fPOD2BNBrVP5", // Polygon

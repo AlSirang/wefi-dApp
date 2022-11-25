@@ -29,8 +29,8 @@ export const loadWeb3Packages = async () => {
       package: WalletConnectProvider, // required
       options: {
         infuraId: "12803c9f5919455ba1ac0be83197d502", // required
-        chainId: 1,
-        mobileLinks: ["metamask", "trust", "imtoken"],
+        chainId: 56,
+        // mobileLinks: ["metamask", "trust", "imtoken"],
         rpc: {
           4: "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161", // Rinkeby Test Network
           56: "https://bsc-dataseed.binance.org/", // BSC
